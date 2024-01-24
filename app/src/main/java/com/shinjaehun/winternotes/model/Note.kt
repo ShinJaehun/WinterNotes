@@ -1,0 +1,11 @@
+package com.shinjaehun.winternotes.model
+
+data class Note (
+    var noteId: Int,
+    val title: String,
+    val dateTime: String,
+    val subtitle: String,
+    val noteContents: String,
+    val imagePath: String?,
+    val color: String?,
+    val webLink: String?)
