@@ -1,9 +1,10 @@
 package com.shinjaehun.winternotes.common
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 
-internal fun Fragment.makeToast(value: String) {
-    Toast.makeText(activity, value, Toast.LENGTH_SHORT).show()
+internal fun Activity.makeToast(value: String) {
+    Toast.makeText(applicationContext, value, Toast.LENGTH_SHORT).show()
 }
 
