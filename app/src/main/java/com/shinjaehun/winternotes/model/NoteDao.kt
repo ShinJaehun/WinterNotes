@@ -4,7 +4,7 @@ import androidx.room.*
 
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM notes ORDER BY id DESC")
+    @Query("SELECT * FROM notes ORDER BY noteId DESC")
     suspend fun getNotes(): List<RoomNote>
 
     @Query("SELECT * FROM notes WHERE noteId = :noteId")

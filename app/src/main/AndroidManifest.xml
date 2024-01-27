@@ -12,14 +12,11 @@
         android:theme="@style/Theme.WinterNotes"
         tools:targetApi="31">
         <activity
-            android:name=".NoteDetailActivity"
+            android:name=".note.notedetail.NoteDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".NoteListActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".note.notelist.NoteListActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

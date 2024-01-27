@@ -1,7 +1,5 @@
 package com.shinjaehun.winternotes.common
 
-import java.lang.Exception
-
 sealed class Result<out E, out V> {
     data class Value<out V>(val value: V): Result<Nothing, V>()
     data class Error<out E>(val error: E): Result<E, Nothing>()
