@@ -32,22 +32,25 @@ class NoteDetailViewModel(
             is NoteDetailEvent.OnStart -> getNote(event.noteId)
             is NoteDetailEvent.OnDeleteClick -> onDelete()
             is NoteDetailEvent.OnDoneClick -> updateNote(event.contents)
+//            is NoteDetailEvent.OnDoneClick -> updateNote(event.note)
             else -> {}
         }
     }
 
+//    private fun updateNote(updatedNote: Note) = launch {
     private fun updateNote(contents: String) = launch {
-        Log.i(TAG, "insertOrUpdateNote?")
+        Log.i(TAG, "insertOrUpdateNote? noteId: ${note.value!!.noteId}")
 
         val updateResult = noteRepo.insertOrUpdateNote(
             note.value!!
+//                .copy(noteContents = updatedNote.noteContents)
                 .copy(noteContents = contents)
 
-            // 왜 JetpackNotes 예제에서 뜬금없이 note를 하나 생성하는 과정이 있었는데...
-            // 그거 하지 않아서 note가 null인 건가?
+    // NoteDetailEvent.OnStart -> getNote() -> newNote()에서 뜬금없이 note를 하나 생성하는 과정이 있었는데...
+    // 그거 하지 않아서 note가 null인 건가?
 
-//                    FATAL EXCEPTION: main
-//            Process: com.shinjaehun.winternotes, PID: 10741
+//        FATAL EXCEPTION: main
+//        Process: com.shinjaehun.winternotes, PID: 10741
 //        java.lang.NullPointerException
 //        at com.shinjaehun.winternotes.note.notedetail.NoteDetailViewModel$updateNote$1.invokeSuspend(NoteDetailViewModel.kt:41)
 //        at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
@@ -61,10 +64,9 @@ class NoteDetailViewModel(
 //        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:548)
 //        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:936)
 //        Suppressed: kotlinx.coroutines.internal.DiagnosticCoroutineContextException: [StandaloneCoroutine{Cancelling}@85ca1c3, Dispatchers.Main]
-
         )
 
-        when (updateResult) {
+    when (updateResult) {
            is Result.Value -> updatedState.value = true
            is Result.Error -> updatedState.value = false
         }
@@ -84,7 +86,7 @@ class NoteDetailViewModel(
             newNote()
         }
         else {
-            Log.i(TAG, "get note?")
+            Log.i(TAG, "get note? noteId: $noteId")
             val noteResult = noteRepo.getNoteById(noteId)
 
             when (noteResult) {

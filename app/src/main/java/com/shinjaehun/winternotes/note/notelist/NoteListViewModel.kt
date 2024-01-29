@@ -34,8 +34,8 @@ class NoteListViewModel(
     }
 
     private fun editNote(position: Int) {
-        Log.i(TAG, noteList.value!![position].noteId.toString())
-        editNoteState.value = noteList.value!![position].noteId.toString() // noteId가 Int이기 때문?? 그렇다면 editNoteState 자료형을 바꿔야 하는 거 아닐까?
+        Log.i(TAG, noteList.value!![position].noteId)
+        editNoteState.value = noteList.value!![position].noteId
     }
 
     private fun getNotes() = launch {

@@ -24,9 +24,14 @@ class NoteListAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return NoteViewHolder(inflater.inflate(R.layout.item_container_note, parent, false))
     }
+
     override fun onBindViewHolder(holder: NoteListAdapter.NoteViewHolder, position: Int) {
-        getItem(position).let {note ->
+        getItem(position).let { note ->
             holder.content.text = note.noteContents
+
+            holder.itemView.setOnClickListener {
+                event.value = NoteListEvent.OnNoteItemClick(position)
+            }
         }
     }
 

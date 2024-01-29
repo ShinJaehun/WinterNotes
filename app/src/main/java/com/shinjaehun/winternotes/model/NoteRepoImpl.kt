@@ -1,9 +1,12 @@
 package com.shinjaehun.winternotes.model
 
+import android.util.Log
 import com.shinjaehun.winternotes.common.Result
 import com.shinjaehun.winternotes.common.toNote
 import com.shinjaehun.winternotes.common.toNoteListFromRoomNote
 import com.shinjaehun.winternotes.common.toRoomNote
+
+private const val TAG = "NoteRepoImpl"
 
 class NoteRepoImpl(
     val local: NoteDao
@@ -38,7 +41,8 @@ class NoteRepoImpl(
     }
 
     private suspend fun insertOrUpdateLocalNote(note: Note): Result<Exception, Unit> = Result.build {
-        local.insertOrUpdateNote(note.toRoomNote)
+        val ret = local.insertOrUpdateNote(note.toRoomNote)
+        Log.i(TAG, "return value: $ret")
         Unit
     }
 }

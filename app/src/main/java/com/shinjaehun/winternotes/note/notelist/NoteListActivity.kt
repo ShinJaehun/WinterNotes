@@ -16,7 +16,6 @@ private const val TAG = "MainActivity"
 class NoteListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNoteListBinding
-
     private lateinit var viewModel: NoteListViewModel
     private lateinit var adapter: NoteListAdapter
 
@@ -40,9 +39,10 @@ class NoteListActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        viewModel.handleEvent(
-            NoteListEvent.OnStart
-        )
+        // OnStart에서 돌리면 되는거지????
+//        viewModel.handleEvent(
+//            NoteListEvent.OnStart
+//        )
     }
 
     override fun onDestroy() {
@@ -50,6 +50,13 @@ class NoteListActivity : AppCompatActivity() {
         binding.notesRecyclerView.adapter = null
         // 이게 없으면 안되는거야?
         // memory leak이 발생하는지 여부를 알 수 있는 방법이 없을까?
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.handleEvent( // 얘가 둘 중 하나에 가 있으면 되지 않을까?
+            NoteListEvent.OnStart
+        )
     }
 
     private fun observeViewModel() {
@@ -63,9 +70,9 @@ class NoteListActivity : AppCompatActivity() {
         viewModel.noteList.observe(
             this,
             Observer { noteList ->
-//                adapter.updateList(noteList)
                 adapter.submitList(noteList)
-
+                // note detail activity에서 DB가 update되는 것 까지 확인하고 finish()했는데
+                // 다시 note list activity가 보여질 때 noteList가 갱신되지 않음
             }
         )
 
@@ -91,7 +98,9 @@ class NoteListActivity : AppCompatActivity() {
     }
 
     private fun startNoteDetailWithArgs(noteId: String?) {
-        Log.i(TAG, "이건 뭐... $noteId")
+        val intent = Intent(applicationContext, NoteDetailActivity::class.java)
+        intent.putExtra("noteId", noteId)
+        startActivity(intent)
     }
 
     private fun showErrorState(errorMessage: String?) = makeToast(errorMessage!!)

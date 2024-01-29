@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "notes", indices = [Index("noteId")])
 data class RoomNote (
-//    @PrimaryKey(autoGenerate = true)
-//    var noteId: Int = 0,
+    @PrimaryKey(autoGenerate = true)
+    var noteId: Int = 0,
 
 //    @ColumnInfo(name = "title")
 //    val title: String,
@@ -32,8 +32,8 @@ data class RoomNote (
 //    val webLink: String? = null
 ) : java.io.Serializable {
 
-    @PrimaryKey(autoGenerate = true)
-    var noteId: Int = 0
+//    @PrimaryKey(autoGenerate = true)
+//    var noteId: Int = 0
 
 //    override fun toString(): String {
 //        return "$title : $dateTime"

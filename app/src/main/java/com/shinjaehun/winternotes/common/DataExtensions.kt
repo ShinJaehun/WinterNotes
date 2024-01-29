@@ -42,7 +42,7 @@ internal val RoomNote.toNote: Note
 
 internal val Note.toRoomNote: RoomNote
     get() = RoomNote(
-//        this.noteId,
+        this.noteId.toInt(),
 //        this.title,
 //        this.dateTime,
 //        this.subtitle,
@@ -51,6 +51,8 @@ internal val Note.toRoomNote: RoomNote
 //        this.color,
 //        this.webLink
     )
+// 지금 문제는 Note를 RoomNote로 변환하는 과정에서 id가 계속 자동으로 생성되어 버린다는 점!
+// RoomNote를 변경해서 update일 경우 새로운 id가 추가되지 않도록 함!
 
 internal fun List<RoomNote>.toNoteListFromRoomNote(): List<Note> = this.flatMap {
     listOf(it.toNote)

@@ -1,5 +1,6 @@
 package com.shinjaehun.winternotes.note.notedetail
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,7 @@ import com.shinjaehun.winternotes.R
 import com.shinjaehun.winternotes.common.makeToast
 import com.shinjaehun.winternotes.common.toEditable
 import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
+import com.shinjaehun.winternotes.model.Note
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,28 +38,22 @@ class NoteDetailActivity : AppCompatActivity() {
             "yyyy MMMM dd, EEEE, HH:mm a",
             Locale.getDefault()).format(Date())
 
+        observeViewModel()
+
+        val noteId = intent.getStringExtra("noteId").toString()
+        viewModel.handleEvent(NoteDetailEvent.OnStart(noteId))
+
         binding.ivSave.setOnClickListener {
             viewModel.handleEvent(
                 NoteDetailEvent.OnDoneClick(
                     binding.etNoteContent.text.toString()
+//                    Note(
+//                        //여기서 noteId를 어떻게 처리해야 할지 모르겠네...
+//                    )
                 )
             )
-//            saveNote()
         }
 
-        observeViewModel()
-
-        val noteId = intent.getStringExtra("noteId").toString()
-        viewModel.handleEvent(
-            NoteDetailEvent.OnStart(
-                noteId
-            )
-        )
-
-    }
-
-    private fun saveNote() {
-        TODO("Not yet implemented")
     }
 
     private fun observeViewModel() {
@@ -71,7 +67,7 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.note.observe(
             this,
             Observer { note ->
-//                binding.etNoteContent.text = note.noteContents.toEditable()
+                binding.etNoteContent.text = note.noteContents.toEditable()
                 Log.i(TAG, "viewModel.note.observe")
             }
         )
@@ -80,6 +76,8 @@ class NoteDetailActivity : AppCompatActivity() {
             this,
             Observer {
                 Log.i(TAG, "viewModel.update.observe")
+                finish()
+                val intent = Intent()
             }
         )
 
