@@ -15,30 +15,16 @@ private const val TAG = "MainActivity"
 
 class NoteListActivity : AppCompatActivity() {
 
-    private lateinit var activityNoteListBinding: ActivityNoteListBinding
+    private lateinit var binding: ActivityNoteListBinding
 
     private lateinit var viewModel: NoteListViewModel
     private lateinit var adapter: NoteListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityNoteListBinding = ActivityNoteListBinding.inflate(layoutInflater)
-        setContentView(activityNoteListBinding.root)
+        binding = ActivityNoteListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        activityNoteListBinding.fabAddNote.setOnClickListener {
-            startActivity(Intent(applicationContext, NoteDetailActivity::class.java))
-        }
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        activityNoteListBinding.notesRecyclerView.adapter = null
-        // 이게 없으면 안되는거야?
-        // memory leak이 발생하는지 여부를 알 수 있는 방법이 없을까?
-    }
-    override fun onStart() {
-        super.onStart()
         viewModel = ViewModelProvider(
             this,
             NoteListInjector(application)
@@ -48,9 +34,22 @@ class NoteListActivity : AppCompatActivity() {
         setupAdapter()
         observeViewModel()
 
+        binding.fabAddNote.setOnClickListener {
+            val intent = Intent(applicationContext, NoteDetailActivity::class.java)
+            intent.putExtra("noteId", "0")
+            startActivity(intent)
+        }
+
         viewModel.handleEvent(
             NoteListEvent.OnStart
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.notesRecyclerView.adapter = null
+        // 이게 없으면 안되는거야?
+        // memory leak이 발생하는지 여부를 알 수 있는 방법이 없을까?
     }
 
     private fun observeViewModel() {
@@ -64,7 +63,8 @@ class NoteListActivity : AppCompatActivity() {
         viewModel.noteList.observe(
             this,
             Observer { noteList ->
-                adapter.updateList(noteList)
+//                adapter.updateList(noteList)
+                adapter.submitList(noteList)
 
             }
         )
@@ -85,9 +85,9 @@ class NoteListActivity : AppCompatActivity() {
                 viewModel.handleEvent(it)
             }
         )
-        activityNoteListBinding.notesRecyclerView.layoutManager=
+        binding.notesRecyclerView.layoutManager=
             StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL)
-        activityNoteListBinding.notesRecyclerView.adapter = adapter
+        binding.notesRecyclerView.adapter = adapter
     }
 
     private fun startNoteDetailWithArgs(noteId: String?) {

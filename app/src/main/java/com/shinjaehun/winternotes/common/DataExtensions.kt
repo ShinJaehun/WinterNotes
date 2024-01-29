@@ -1,5 +1,6 @@
 package com.shinjaehun.winternotes.common
 
+import android.text.Editable
 import com.google.android.play.core.tasks.Task
 import com.shinjaehun.winternotes.model.Note
 import com.shinjaehun.winternotes.model.RoomNote
@@ -29,29 +30,30 @@ internal suspend fun <T> awaitTaskCompletable(task: Task<T>): Unit = suspendCoro
 
 internal val RoomNote.toNote: Note
     get() = Note(
-        this.noteId,
-        this.title,
-        this.dateTime,
-        this.subtitle,
+        this.noteId.toString(),
+//        this.title,
+//        this.dateTime,
+//        this.subtitle,
         this.noteContents,
-        this.imagePath,
-        this.color,
-        this.webLink
+//        this.imagePath,
+//        this.color,
+//        this.webLink
     )
 
 internal val Note.toRoomNote: RoomNote
     get() = RoomNote(
-        this.noteId,
-        this.title,
-        this.dateTime,
-        this.subtitle,
+//        this.noteId,
+//        this.title,
+//        this.dateTime,
+//        this.subtitle,
         this.noteContents,
-        this.imagePath,
-        this.color,
-        this.webLink
+//        this.imagePath,
+//        this.color,
+//        this.webLink
     )
 
 internal fun List<RoomNote>.toNoteListFromRoomNote(): List<Note> = this.flatMap {
     listOf(it.toNote)
 }
 
+internal fun String.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)

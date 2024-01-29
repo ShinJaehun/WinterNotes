@@ -196,7 +196,7 @@
             </LinearLayout>
 
             <EditText
-                android:id="@+id/et_note"
+                android:id="@+id/et_noteContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_12sdp"

@@ -8,7 +8,7 @@ interface NoteDao {
     suspend fun getNotes(): List<RoomNote>
 
     @Query("SELECT * FROM notes WHERE noteId = :noteId")
-    suspend fun getNoteById(noteId: Int): RoomNote
+    suspend fun getNoteById(noteId: String): RoomNote
 
     @Delete
     suspend fun deleteNote(note: RoomNote)

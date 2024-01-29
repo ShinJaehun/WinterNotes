@@ -12,7 +12,7 @@ class NoteRepoImpl(
         return getLocalNotes()
     }
 
-    override suspend fun getNoteById(noteId: Int): Result<Exception, Note> {
+    override suspend fun getNoteById(noteId: String): Result<Exception, Note> {
         return getLocalNote(noteId)
     }
 
@@ -28,7 +28,7 @@ class NoteRepoImpl(
         local.getNotes().toNoteListFromRoomNote()
     }
 
-    private suspend fun getLocalNote(noteId: Int): Result<Exception, Note> = Result.build {
+    private suspend fun getLocalNote(noteId: String): Result<Exception, Note> = Result.build {
         local.getNoteById(noteId).toNote
     }
 
