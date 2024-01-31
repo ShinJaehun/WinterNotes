@@ -41,8 +41,7 @@ class NoteRepoImpl(
     }
 
     private suspend fun insertOrUpdateLocalNote(note: Note): Result<Exception, Unit> = Result.build {
-        val ret = local.insertOrUpdateNote(note.toRoomNote)
-        Log.i(TAG, "return value: $ret")
+        local.insertOrUpdateNote(note.toRoomNote)
         Unit
     }
 }

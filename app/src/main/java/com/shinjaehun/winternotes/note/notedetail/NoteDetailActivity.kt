@@ -41,6 +41,7 @@ class NoteDetailActivity : AppCompatActivity() {
         observeViewModel()
 
         val noteId = intent.getStringExtra("noteId").toString()
+//        Log.i(TAG, "noteId: $noteId") // NoteListActivity에서 intent로 "0"을 보냄
         viewModel.handleEvent(NoteDetailEvent.OnStart(noteId))
 
         binding.ivSave.setOnClickListener {
@@ -53,7 +54,6 @@ class NoteDetailActivity : AppCompatActivity() {
                 )
             )
         }
-
     }
 
     private fun observeViewModel() {
@@ -77,7 +77,7 @@ class NoteDetailActivity : AppCompatActivity() {
             Observer {
                 Log.i(TAG, "viewModel.update.observe")
                 finish()
-                val intent = Intent()
+//                val intent = Intent()
             }
         )
 

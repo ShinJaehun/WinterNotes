@@ -70,9 +70,8 @@ class NoteListActivity : AppCompatActivity() {
         viewModel.noteList.observe(
             this,
             Observer { noteList ->
-                adapter.submitList(noteList)
-                // note detail activity에서 DB가 update되는 것 까지 확인하고 finish()했는데
-                // 다시 note list activity가 보여질 때 noteList가 갱신되지 않음
+                adapter.updateList(noteList)
+//                binding.notesRecyclerView.smoothScrollToPosition(0)
             }
         )
 
@@ -85,6 +84,7 @@ class NoteListActivity : AppCompatActivity() {
     }
 
     private fun setupAdapter() {
+//        adapter = NoteListAdapter()
         adapter = NoteListAdapter()
         adapter.event.observe(
             this,
