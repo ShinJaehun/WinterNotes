@@ -2,6 +2,7 @@ package com.shinjaehun.winternotes.note.notelist
 
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,18 +52,19 @@ class NoteListAdapter(
 
                 binding.tvDateTime.text = simpleDate(this.dateTime)
 
+                if (!this.imagePath.isNullOrEmpty()) {
+                    binding.rivImagePreview.setImageURI(Uri.parse(this.imagePath))
+                    binding.rivImagePreview.visibility = View.VISIBLE
+                } else {
+                    binding.rivImagePreview.visibility = View.GONE
+                }
+
                 val gradientDrawable = binding.layoutNote.background as GradientDrawable
-                if (this.color != null) {
+                if (!this.color.isNullOrEmpty()) {
                     gradientDrawable.setColor(Color.parseColor(this.color))
                 } else {
                     gradientDrawable.setColor(Color.parseColor(BLACK))
                 }
-//
-//                if (this.imagePath != null && this.imagePath != "") {
-//                    binding.rivImagePreview.visibility = View.VISIBLE
-//                } else {
-//                    binding.rivImagePreview.visibility = View.GONE
-//                }
 
                 binding.layoutNote.setOnClickListener {
                     event.value = NoteListEvent.OnNoteItemClick(position)

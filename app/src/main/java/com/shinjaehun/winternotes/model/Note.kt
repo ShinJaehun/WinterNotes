@@ -6,7 +6,7 @@ data class Note (
     val dateTime: String,
     val subtitle: String,
     val noteContents: String,
-//    val imagePath: String?,
+    val imagePath: String?,
     val color: String?,
 //    val webLink: String?
 )

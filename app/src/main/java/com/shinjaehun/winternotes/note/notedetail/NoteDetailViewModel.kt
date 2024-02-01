@@ -29,24 +29,35 @@ class NoteDetailViewModel(
 
     private val changedNoteColorState = MutableLiveData<String>()
     val changedNoteColor: LiveData<String> get() = changedNoteColorState
+
+    private val changedNoteImageState = MutableLiveData<String>()
+    val changedNoteImage: LiveData<String> get() = changedNoteImageState
+
     override fun handleEvent(event: NoteDetailEvent) {
         when(event) {
             is NoteDetailEvent.OnStart -> getNote(event.noteId)
             is NoteDetailEvent.OnDeleteClick -> onDelete()
-            is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents, event.color)
+            is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents, event.imagePath, event.color)
 //            is NoteDetailEvent.OnDoneClick -> updateNote(event.note)
             is NoteDetailEvent.OnColorButtonClick -> changeNoteColor(event.color)
+            is NoteDetailEvent.OnImageButtonClick -> changeNoteImage(event.imagePath)
             else -> {}
         }
     }
 
+    private fun changeNoteImage(imagePath: String) {
+        changedNoteImageState.value = imagePath
+    }
+
     private fun changeNoteColor(color: String) {
-//        Log.i(TAG, "$color")
+//        왜 activity를 열 때마다 note를 가지고 올 때마다 changedNoteColor가 발생하는 걸까?
+        Log.i(TAG, "${changedNoteColor.value}")
         changedNoteColorState.value = color
+        Log.i(TAG, "$color")
     }
 
     //    private fun updateNote(updatedNote: Note) = launch {
-    private fun updateNote(title: String, subTitle: String, contents: String, color: String) = launch {
+    private fun updateNote(title: String, subTitle: String, contents: String, imagePath: String, color: String) = launch {
 //        Log.i(TAG, "insertOrUpdateNote? noteId: ${note.value!!.noteId}")
 
         val updateResult = noteRepo.insertOrUpdateNote(
@@ -57,6 +68,7 @@ class NoteDetailViewModel(
                     dateTime = currentTime(),
                     subtitle = subTitle,
                     noteContents = contents,
+                    imagePath = imagePath,
                     color = color
                 )
         )
@@ -91,6 +103,6 @@ class NoteDetailViewModel(
     }
 
     private fun newNote() {
-        noteState.value = Note("0","", currentTime(), "", "", BLACK)
+        noteState.value = Note("0","", currentTime(), "", "", "", BLACK)
     }
 }

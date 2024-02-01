@@ -22,8 +22,8 @@ data class RoomNote (
     @ColumnInfo(name = "note_contents")
     val noteContents: String,
 
-//    @ColumnInfo(name = "image_path")
-//    val imagePath: String? = null,
+    @ColumnInfo(name = "image_path")
+    val imagePath: String? = null,
 
     @ColumnInfo(name = "color")
     val color: String? = null,

@@ -22,5 +22,7 @@ internal const val PINK = "#FF1D8E"
 internal const val DARKBLUE = "#3a52Fc"
 internal const val YELLOW = "#F3DD5C"
 internal const val LIGHTBLUE = "#1AA7EC"
+internal const val REQUEST_CODE_STORAGE_PERMISSION = 11
+internal const val REQUEST_CODE_SELECT_IMAGE = 12
 
 internal const val RC_SIGN_IN = 1337

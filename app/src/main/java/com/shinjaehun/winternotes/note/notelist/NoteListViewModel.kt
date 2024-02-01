@@ -24,8 +24,6 @@ class NoteListViewModel(
     private val editNoteState = MutableLiveData<String>()
     val editNote: LiveData<String> get() = editNoteState
 
-
-
     override fun handleEvent(event: NoteListEvent) {
         when(event) {
 //            is NoteListEvent.OnNewNoteClick -> TODO()
