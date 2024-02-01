@@ -3,9 +3,8 @@ package com.shinjaehun.winternotes.note.notedetail
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.shinjaehun.winternotes.common.BaseViewModel
+import com.shinjaehun.winternotes.common.*
 import com.shinjaehun.winternotes.common.GET_NOTE_ERROR
-import com.shinjaehun.winternotes.common.Result
 import com.shinjaehun.winternotes.common.currentTime
 import com.shinjaehun.winternotes.model.INoteRepository
 import com.shinjaehun.winternotes.model.Note
@@ -28,18 +27,26 @@ class NoteDetailViewModel(
     private val updatedState = MutableLiveData<Boolean>()
     val updated: LiveData<Boolean> get() = updatedState
 
+    private val changedNoteColorState = MutableLiveData<String>()
+    val changedNoteColor: LiveData<String> get() = changedNoteColorState
     override fun handleEvent(event: NoteDetailEvent) {
         when(event) {
             is NoteDetailEvent.OnStart -> getNote(event.noteId)
             is NoteDetailEvent.OnDeleteClick -> onDelete()
-            is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents)
+            is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents, event.color)
 //            is NoteDetailEvent.OnDoneClick -> updateNote(event.note)
+            is NoteDetailEvent.OnColorButtonClick -> changeNoteColor(event.color)
             else -> {}
         }
     }
 
-//    private fun updateNote(updatedNote: Note) = launch {
-    private fun updateNote(title: String, subTitle: String, contents: String) = launch {
+    private fun changeNoteColor(color: String) {
+//        Log.i(TAG, "$color")
+        changedNoteColorState.value = color
+    }
+
+    //    private fun updateNote(updatedNote: Note) = launch {
+    private fun updateNote(title: String, subTitle: String, contents: String, color: String) = launch {
 //        Log.i(TAG, "insertOrUpdateNote? noteId: ${note.value!!.noteId}")
 
         val updateResult = noteRepo.insertOrUpdateNote(
@@ -49,7 +56,9 @@ class NoteDetailViewModel(
                     title = title,
                     dateTime = currentTime(),
                     subtitle = subTitle,
-                    noteContents = contents)
+                    noteContents = contents,
+                    color = color
+                )
         )
 
         when (updateResult) {
@@ -82,6 +91,6 @@ class NoteDetailViewModel(
     }
 
     private fun newNote() {
-        noteState.value = Note("0","", currentTime(), "", "")
+        noteState.value = Note("0","", currentTime(), "", "", BLACK)
     }
 }

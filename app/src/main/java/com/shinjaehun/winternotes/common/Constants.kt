@@ -17,4 +17,10 @@ internal const val RETRY = "RETRY"
 //internal const val ANTENNA_FULL = "ic_antenna_full"
 //internal const val ANTENNA_LOOP = "antenna_loop_fast"
 
+internal const val BLACK = "#333333"
+internal const val PINK = "#FF1D8E"
+internal const val DARKBLUE = "#3a52Fc"
+internal const val YELLOW = "#F3DD5C"
+internal const val LIGHTBLUE = "#1AA7EC"
+
 internal const val RC_SIGN_IN = 1337

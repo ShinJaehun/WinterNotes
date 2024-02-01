@@ -36,7 +36,7 @@ internal val RoomNote.toNote: Note
         this.subtitle,
         this.noteContents,
 //        this.imagePath,
-//        this.color,
+        this.color,
 //        this.webLink
     )
 
@@ -48,7 +48,7 @@ internal val Note.toRoomNote: RoomNote
         this.subtitle,
         this.noteContents,
 //        this.imagePath,
-//        this.color,
+        this.color,
 //        this.webLink
     )
 

@@ -7,6 +7,6 @@ data class Note (
     val subtitle: String,
     val noteContents: String,
 //    val imagePath: String?,
-//    val color: String?,
+    val color: String?,
 //    val webLink: String?
 )

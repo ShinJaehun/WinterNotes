@@ -10,6 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.shinjaehun.winternotes.R
+import com.shinjaehun.winternotes.common.BLACK
+import com.shinjaehun.winternotes.common.simpleDate
 import com.shinjaehun.winternotes.databinding.ItemContainerNoteBinding
 import com.shinjaehun.winternotes.model.Note
 
@@ -39,34 +41,28 @@ class NoteListAdapter(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         with(holder){
             with(allNotes[position]){
-//                binding.tvTitle.text = this.title
-//
-//                if (this.subtitle.trim().isEmpty()){
-//                    binding.tvSubtitle.visibility= View.GONE
-//                } else {
-//                    binding.tvSubtitle.text = this.subtitle
-//                }
-//
-//                binding.tvDateTime.text = this.dateTime
-//
-//                val gradientDrawable = binding.layoutNote.background as GradientDrawable
-//                if (this.color != null) {
-//                    gradientDrawable.setColor(Color.parseColor(this.color))
-//                } else {
-//                    gradientDrawable.setColor(Color.parseColor("#333333"))
-//                }
+                binding.tvTitle.text = this.title
+
+                if (this.subtitle.trim().isEmpty()){
+                    binding.tvSubtitle.visibility= View.GONE
+                } else {
+                    binding.tvSubtitle.text = this.subtitle
+                }
+
+                binding.tvDateTime.text = simpleDate(this.dateTime)
+
+                val gradientDrawable = binding.layoutNote.background as GradientDrawable
+                if (this.color != null) {
+                    gradientDrawable.setColor(Color.parseColor(this.color))
+                } else {
+                    gradientDrawable.setColor(Color.parseColor(BLACK))
+                }
 //
 //                if (this.imagePath != null && this.imagePath != "") {
 //                    binding.rivImagePreview.visibility = View.VISIBLE
 //                } else {
 //                    binding.rivImagePreview.visibility = View.GONE
 //                }
-
-                if (this.noteContents.trim().isEmpty()){
-                    binding.tvContent.visibility= View.GONE
-                } else {
-                    binding.tvContent.text = this.noteContents
-                }
 
                 binding.layoutNote.setOnClickListener {
                     event.value = NoteListEvent.OnNoteItemClick(position)

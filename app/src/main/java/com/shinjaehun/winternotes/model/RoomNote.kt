@@ -24,10 +24,10 @@ data class RoomNote (
 
 //    @ColumnInfo(name = "image_path")
 //    val imagePath: String? = null,
-//
-//    @ColumnInfo(name = "color")
-//    val color: String? = null,
-//
+
+    @ColumnInfo(name = "color")
+    val color: String? = null,
+
 //    @ColumnInfo(name = "web_link")
 //    val webLink: String? = null
 ) : java.io.Serializable {
