@@ -38,11 +38,6 @@ class NoteListActivity : AppCompatActivity() {
             intent.putExtra("noteId", "0")
             startActivity(intent)
         }
-
-        // OnStart에서 돌리면 되는거지????
-//        viewModel.handleEvent(
-//            NoteListEvent.OnStart
-//        )
     }
 
     override fun onDestroy() {
@@ -54,7 +49,7 @@ class NoteListActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.handleEvent( // 얘가 둘 중 하나에 가 있으면 되지 않을까?
+        viewModel.handleEvent(
             NoteListEvent.OnStart
         )
     }
@@ -71,7 +66,6 @@ class NoteListActivity : AppCompatActivity() {
             this,
             Observer { noteList ->
                 adapter.updateList(noteList)
-//                binding.notesRecyclerView.smoothScrollToPosition(0)
             }
         )
 
@@ -84,7 +78,6 @@ class NoteListActivity : AppCompatActivity() {
     }
 
     private fun setupAdapter() {
-//        adapter = NoteListAdapter()
         adapter = NoteListAdapter()
         adapter.event.observe(
             this,

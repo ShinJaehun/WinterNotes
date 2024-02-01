@@ -27,6 +27,7 @@ class NoteListViewModel(
     override fun handleEvent(event: NoteListEvent) {
         when(event) {
 //            is NoteListEvent.OnNewNoteClick -> TODO()
+            // fab을 클릭하면 NoteDetailActivity를 실행시키기만 하면 되므로(다른 로직 필요 없음) 걍 activity에서 event로 처리
             is NoteListEvent.OnStart ->getNotes()
             is NoteListEvent.OnNoteItemClick -> editNote(event.position)
             else -> {}

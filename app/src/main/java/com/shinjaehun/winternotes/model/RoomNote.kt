@@ -10,14 +10,14 @@ data class RoomNote (
     @PrimaryKey(autoGenerate = true)
     var noteId: Int = 0,
 
-//    @ColumnInfo(name = "title")
-//    val title: String,
-//
-//    @ColumnInfo(name = "date_time")
-//    val dateTime: String,
-//
-//    @ColumnInfo(name = "subtitle")
-//    val subtitle: String,
+    @ColumnInfo(name = "title")
+    val title: String,
+
+    @ColumnInfo(name = "date_time")
+    val dateTime: String,
+
+    @ColumnInfo(name = "subtitle")
+    val subtitle: String,
 
     @ColumnInfo(name = "note_contents")
     val noteContents: String,

@@ -1,18 +1,14 @@
 package com.shinjaehun.winternotes.note.notedetail
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.shinjaehun.winternotes.R
 import com.shinjaehun.winternotes.common.makeToast
+import com.shinjaehun.winternotes.common.currentTime
 import com.shinjaehun.winternotes.common.toEditable
 import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
-import com.shinjaehun.winternotes.model.Note
-import java.text.SimpleDateFormat
-import java.util.*
 
 private const val TAG = "NoteDetailActivity"
 class NoteDetailActivity : AppCompatActivity() {
@@ -34,10 +30,6 @@ class NoteDetailActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        binding.tvDateTime.text = SimpleDateFormat(
-            "yyyy MMMM dd, EEEE, HH:mm a",
-            Locale.getDefault()).format(Date())
-
         observeViewModel()
 
         val noteId = intent.getStringExtra("noteId").toString()
@@ -47,6 +39,8 @@ class NoteDetailActivity : AppCompatActivity() {
         binding.ivSave.setOnClickListener {
             viewModel.handleEvent(
                 NoteDetailEvent.OnDoneClick(
+                    binding.etNoteTitle.text.toString(),
+                    binding.etNoteSubtitle.text.toString(),
                     binding.etNoteContent.text.toString()
 //                    Note(
 //                        //여기서 noteId를 어떻게 처리해야 할지 모르겠네...
@@ -67,7 +61,11 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.note.observe(
             this,
             Observer { note ->
+                binding.etNoteTitle.text = note.title.toEditable()
+                binding.tvDateTime.text = note.dateTime
+                binding.etNoteSubtitle.text = note.subtitle.toEditable()
                 binding.etNoteContent.text = note.noteContents.toEditable()
+
                 Log.i(TAG, "viewModel.note.observe")
             }
         )
@@ -77,7 +75,6 @@ class NoteDetailActivity : AppCompatActivity() {
             Observer {
                 Log.i(TAG, "viewModel.update.observe")
                 finish()
-//                val intent = Intent()
             }
         )
 
@@ -90,5 +87,4 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     private fun showErrorState(errorMessage: String?) = makeToast(errorMessage!!)
-
 }

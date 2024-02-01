@@ -14,7 +14,7 @@ import com.shinjaehun.winternotes.databinding.ItemContainerNoteBinding
 import com.shinjaehun.winternotes.model.Note
 
 class NoteListAdapter(
-    val event: MutableLiveData<NoteListEvent> = MutableLiveData()
+    val event: MutableLiveData<NoteListEvent> = MutableLiveData() // 이게 필요한 이유는 click listener 때문
 ): RecyclerView.Adapter<NoteListAdapter.NoteViewHolder>() {
 
     private val allNotes = ArrayList<Note>()
@@ -75,30 +75,3 @@ class NoteListAdapter(
         }
     }
 }
-
-//class NoteListAdapter(
-//    val event: MutableLiveData<NoteListEvent> = MutableLiveData()
-//): ListAdapter<Note, NoteListAdapter.NoteViewHolder>(NoteDiffUtilCallback()){
-//
-//    override fun onCreateViewHolder(
-//        parent: ViewGroup,
-//        viewType: Int,
-//    ): NoteListAdapter.NoteViewHolder {
-//        val inflater = LayoutInflater.from(parent.context)
-//        return NoteViewHolder(inflater.inflate(R.layout.item_container_note, parent, false))
-//    }
-//
-//    override fun onBindViewHolder(holder: NoteListAdapter.NoteViewHolder, position: Int) {
-//        getItem(position).let { note ->
-//            holder.content.text = note.noteContents
-//
-//            holder.itemView.setOnClickListener {
-//                event.value = NoteListEvent.OnNoteItemClick(position)
-//            }
-//        }
-//    }
-//
-//    inner class NoteViewHolder(root: View):RecyclerView.ViewHolder(root){
-//        var content: TextView = root.findViewById(R.id.tv_content)
-//    }
-//}

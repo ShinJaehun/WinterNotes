@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.shinjaehun.winternotes.common.BaseViewModel
 import com.shinjaehun.winternotes.common.GET_NOTE_ERROR
 import com.shinjaehun.winternotes.common.Result
+import com.shinjaehun.winternotes.common.currentTime
 import com.shinjaehun.winternotes.model.INoteRepository
 import com.shinjaehun.winternotes.model.Note
 import kotlinx.coroutines.launch
@@ -31,20 +32,24 @@ class NoteDetailViewModel(
         when(event) {
             is NoteDetailEvent.OnStart -> getNote(event.noteId)
             is NoteDetailEvent.OnDeleteClick -> onDelete()
-            is NoteDetailEvent.OnDoneClick -> updateNote(event.contents)
+            is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents)
 //            is NoteDetailEvent.OnDoneClick -> updateNote(event.note)
             else -> {}
         }
     }
 
 //    private fun updateNote(updatedNote: Note) = launch {
-    private fun updateNote(contents: String) = launch {
+    private fun updateNote(title: String, subTitle: String, contents: String) = launch {
 //        Log.i(TAG, "insertOrUpdateNote? noteId: ${note.value!!.noteId}")
 
         val updateResult = noteRepo.insertOrUpdateNote(
             note.value!!
 //                .copy(noteContents = updatedNote.noteContents)
-                .copy(noteContents = contents)
+                .copy(
+                    title = title,
+                    dateTime = currentTime(),
+                    subtitle = subTitle,
+                    noteContents = contents)
         )
 
         when (updateResult) {
@@ -77,6 +82,6 @@ class NoteDetailViewModel(
     }
 
     private fun newNote() {
-        noteState.value = Note("0","")
+        noteState.value = Note("0","", currentTime(), "", "")
     }
 }
