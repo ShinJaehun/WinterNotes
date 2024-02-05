@@ -1,6 +1,7 @@
 package com.shinjaehun.winternotes.note.notedetail
 
 import android.Manifest.permission.*
+import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -11,6 +12,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -18,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +31,7 @@ import com.shinjaehun.winternotes.common.BLACK
 import com.shinjaehun.winternotes.common.makeToast
 import com.shinjaehun.winternotes.common.toEditable
 import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
+import java.io.File
 
 private const val TAG = "NoteDetailActivity"
 class NoteDetailActivity : AppCompatActivity() {
@@ -69,14 +73,12 @@ class NoteDetailActivity : AppCompatActivity() {
                 val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
                 val colorCode = String.format("#%06X", (0xFFFFFF and gradientDrawable.color!!.defaultColor!!));
 
-                Log.i(TAG, "$selectedImagePath")
-
                 viewModel.handleEvent(
                     NoteDetailEvent.OnDoneClick(
                         binding.etNoteTitle.text.toString(),
                         binding.etNoteSubtitle.text.toString(),
                         binding.etNoteContent.text.toString(),
-                        selectedImagePath, // 일단 임시로 이렇게는 해놨는데...패턴에 어긋남.
+                        selectedImagePath, // 일단 임시로 이렇게는 해놨는데... 이렇게 해도 되는건지는 모르겠음.
                         colorCode, //colorCode도 사실 저렇게 전역변수로 처리하면 될텐데 그렇게 하면 안되는거지?
 //                    Note(
 //                        //여기서 noteId를 어떻게 처리해야 할지 모르겠네...
@@ -234,19 +236,58 @@ class NoteDetailActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        var fileName = ""
         if (requestCode == REQUEST_CODE_SELECT_IMAGE) {
             if (data != null) {
                 val selectedImageUri = data.data
-                if (selectedImageUri != null) {
-                    try {
-                        binding.ivNote.setImageURI(selectedImageUri)
-                        binding.ivNote.visibility = View.VISIBLE
+                selectedImageUri.let { returnUri ->
+                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
+                }?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+//                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                    cursor.moveToFirst()
+                    fileName = cursor.getString(nameIndex)
+//                    Log.i(TAG, "${cursor.getString(nameIndex)}")
+//                    Log.i(TAG, "${cursor.getString(sizeIndex)}")
+                }
 
+//                Log.i(TAG, "onActivityResult: $selectedImageUri")
+                if (selectedImageUri != null) {
+//                    Log.i(TAG, "onActivityResult: ${selectedImageUri!!.path!!.substring(selectedImageUri!!.path!!.lastIndexOf('/') + 1)}")
+
+                    try {
+                        FileUtils.application = application
+                        FileUtils.cRes = contentResolver
+
+                        val inputStream = FileUtils.getInputStream(selectedImageUri)
+
+                        val path = this.getExternalFilesDir(null)
+                        val folder = File(path, "images")
+                        folder.mkdirs()
+
+                        val outputFile = File(folder, fileName)
+
+                        FileUtils.copyStreamToFile(inputStream!!, outputFile)
+//                        Log.i(TAG, outputFile.path)
+
+                        binding.ivNote.setImageURI(Uri.fromFile(outputFile))
+                        binding.ivNote.visibility = View.VISIBLE
                         binding.ivDeleteImage.visibility = View.VISIBLE
 
+                        selectedImagePath = outputFile.path
+
                         viewModel.handleEvent(
-                            NoteDetailEvent.OnImageButtonClick(getPathFromUri(selectedImageUri))
+                            NoteDetailEvent.OnImageButtonClick(selectedImagePath)
                         )
+
+//                        binding.ivNote.setImageURI(selectedImageUri)
+//                        binding.ivNote.visibility = View.VISIBLE
+//
+//                        binding.ivDeleteImage.visibility = View.VISIBLE
+//
+//                        viewModel.handleEvent(
+//                            NoteDetailEvent.OnImageButtonClick(getPathFromUri(selectedImageUri))
+//                        )
 
 //                        selectedImagePath = getPathFromUri(selectedImageUri)
                     } catch (e: Exception) {
@@ -257,26 +298,32 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun getPathFromUri(contentUri: Uri): String {
-        // contentResolver와 cursor에 대해 공부 필요!
-        val filePath: String
-        val cursor = contentResolver.query(contentUri, null, null, null, null)
-        if (cursor == null) {
-            filePath = contentUri.path.toString()
-        } else {
-            cursor.moveToFirst()
-            val index = cursor.getColumnIndex("_data")
-            filePath = cursor.getString(index)
-            cursor.close()
-        }
-        return filePath
-    }
+//    private fun getPathFromUri(contentUri: Uri): String {
+//        // contentResolver와 cursor에 대해 공부 필요!
+//        val filePath: String
+//        val cursor = contentResolver.query(contentUri, null, null, null, null)
+//        if (cursor == null) {
+//            filePath = contentUri.path.toString()
+//        } else {
+//            cursor.moveToFirst()
+//            val index = cursor.getColumnIndex("_data")
+//            filePath = cursor.getString(index)
+//            cursor.close()
+//        }
+//        return filePath
+//    }
 
     private fun selectImage() {
-        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
-            it.type = "image/*"
+
+//        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
+//            it.type = "image/*"
+//            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE) }
+
+        Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
+            it.type="image/*"
             startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE)
         }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -316,7 +363,7 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.note.observe(
             this,
             Observer { note ->
-                Log.i(TAG, "1 $selectedImagePath")
+//                Log.i(TAG, "1 $selectedImagePath")
 
                 binding.etNoteTitle.text = note.title.toEditable()
                 binding.tvDateTime.text = note.dateTime
@@ -349,7 +396,7 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.updated.observe(
             this,
             Observer {
-                Log.i(TAG, "2 $selectedImagePath")
+//                Log.i(TAG, "2 $selectedImagePath")
 
                 Log.i(TAG, "viewModel.update.observe")
                 finish()
@@ -360,7 +407,7 @@ class NoteDetailActivity : AppCompatActivity() {
             this,
             Observer{ imagePath ->
                 selectedImagePath=imagePath // 얘를 이렇게 저장하면 안되는거?
-                Log.i(TAG, "3 $selectedImagePath")
+//                Log.i(TAG, "3 $selectedImagePath")
 
                 showImage(imagePath)
                 Log.i(TAG, "viewModel.changedNoteImage.observe")
@@ -370,7 +417,7 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.changedNoteColor.observe(
             this,
             Observer { noteColor ->
-                Log.i(TAG, "4 $selectedImagePath")
+//                Log.i(TAG, "4 $selectedImagePath")
 
                 setSubtitleIndicatorColor(noteColor)
                 Log.i(TAG, "viewModel.changedNoteColor.observe")
