@@ -1,7 +1,5 @@
 package com.shinjaehun.winternotes.note.notedetail
 
-import com.shinjaehun.winternotes.model.Note
-
 sealed class NoteDetailEvent {
     data class OnDoneClick(
         val title: String,
@@ -14,6 +12,6 @@ sealed class NoteDetailEvent {
     object OnDeleteClick: NoteDetailEvent()
     object OnDeleteConfirmed: NoteDetailEvent()
     data class OnStart(val noteId: String): NoteDetailEvent()
-    data class OnColorButtonClick(val color: String): NoteDetailEvent()
-    data class OnImageButtonClick(val imagePath: String): NoteDetailEvent()
+    data class OnNoteColorChange(val color: String): NoteDetailEvent()
+    data class OnNoteImageChange(val imagePath: String): NoteDetailEvent()
 }

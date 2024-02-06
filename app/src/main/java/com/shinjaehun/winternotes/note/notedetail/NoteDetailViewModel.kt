@@ -39,8 +39,8 @@ class NoteDetailViewModel(
             is NoteDetailEvent.OnDeleteClick -> onDelete()
             is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents, event.imagePath, event.color)
 //            is NoteDetailEvent.OnDoneClick -> updateNote(event.note)
-            is NoteDetailEvent.OnColorButtonClick -> changeNoteColor(event.color)
-            is NoteDetailEvent.OnImageButtonClick -> changeNoteImage(event.imagePath)
+            is NoteDetailEvent.OnNoteColorChange -> changeNoteColor(event.color)
+            is NoteDetailEvent.OnNoteImageChange -> changeNoteImage(event.imagePath)
             else -> {}
         }
     }

@@ -1,26 +1,19 @@
 package com.shinjaehun.winternotes.note.notedetail
 
-import android.Manifest.permission.*
-import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -31,7 +24,6 @@ import com.shinjaehun.winternotes.common.BLACK
 import com.shinjaehun.winternotes.common.makeToast
 import com.shinjaehun.winternotes.common.toEditable
 import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
-import java.io.File
 
 private const val TAG = "NoteDetailActivity"
 class NoteDetailActivity : AppCompatActivity() {
@@ -116,7 +108,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnColorButtonClick(BLACK)
+                NoteDetailEvent.OnNoteColorChange(BLACK)
             )
         }
 
@@ -127,7 +119,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnColorButtonClick(PINK)
+                NoteDetailEvent.OnNoteColorChange(PINK)
             )
         }
 
@@ -138,7 +130,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnColorButtonClick(DARKBLUE)
+                NoteDetailEvent.OnNoteColorChange(DARKBLUE)
             )
         }
 
@@ -149,7 +141,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(R.drawable.ic_done)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnColorButtonClick(YELLOW)
+                NoteDetailEvent.OnNoteColorChange(YELLOW)
             )
         }
 
@@ -160,7 +152,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(R.drawable.ic_done)
             viewModel.handleEvent(
-                NoteDetailEvent.OnColorButtonClick(LIGHTBLUE)
+                NoteDetailEvent.OnNoteColorChange(LIGHTBLUE)
             )
         }
 
@@ -220,10 +212,10 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
 
-//        activityCreateNoteBinding.misc.layoutAddUrl.setOnClickListener {
-//            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-//            showAddURLDialog()
-//        }
+        binding.misc.layoutAddUrl.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            showAddURLDialog()
+        }
 
 //        if (alreadyAvailableNote != null) {
 //            activityCreateNoteBinding.misc.layoutDeleteNote.visibility = View.VISIBLE
@@ -234,62 +226,64 @@ class NoteDetailActivity : AppCompatActivity() {
 //        }
     }
 
+    private fun showAddURLDialog() {
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         var fileName = ""
         if (requestCode == REQUEST_CODE_SELECT_IMAGE) {
             if (data != null) {
                 val selectedImageUri = data.data
-                selectedImageUri.let { returnUri ->
-                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
-                }?.use { cursor ->
-                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                // 이건 official document에서 보장하는 내용
+//                selectedImageUri.let { returnUri ->
+//                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
+//                }?.use { cursor ->
+//                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
 //                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-                    cursor.moveToFirst()
-                    fileName = cursor.getString(nameIndex)
+//                    cursor.moveToFirst()
 //                    Log.i(TAG, "${cursor.getString(nameIndex)}")
 //                    Log.i(TAG, "${cursor.getString(sizeIndex)}")
-                }
+//                    fileName = cursor.getString(nameIndex)
+//                }
 
 //                Log.i(TAG, "onActivityResult: $selectedImageUri")
                 if (selectedImageUri != null) {
 //                    Log.i(TAG, "onActivityResult: ${selectedImageUri!!.path!!.substring(selectedImageUri!!.path!!.lastIndexOf('/') + 1)}")
 
                     try {
-                        FileUtils.application = application
-                        FileUtils.cRes = contentResolver
-
-                        val inputStream = FileUtils.getInputStream(selectedImageUri)
-
-                        val path = this.getExternalFilesDir(null)
-                        val folder = File(path, "images")
-                        folder.mkdirs()
-
-                        val outputFile = File(folder, fileName)
-
-                        FileUtils.copyStreamToFile(inputStream!!, outputFile)
-//                        Log.i(TAG, outputFile.path)
-
-                        binding.ivNote.setImageURI(Uri.fromFile(outputFile))
-                        binding.ivNote.visibility = View.VISIBLE
-                        binding.ivDeleteImage.visibility = View.VISIBLE
-
-                        selectedImagePath = outputFile.path
-
-                        viewModel.handleEvent(
-                            NoteDetailEvent.OnImageButtonClick(selectedImagePath)
-                        )
-
-//                        binding.ivNote.setImageURI(selectedImageUri)
-//                        binding.ivNote.visibility = View.VISIBLE
+                        // private storage issue 때문에 이미지 복사
+//                        FileUtils.application = application
+//                        FileUtils.cRes = contentResolver
 //
+//                        val inputStream = FileUtils.getInputStream(selectedImageUri)
+//                        val path = this.getExternalFilesDir(null)
+//                        val folder = File(path, "images")
+//                        folder.mkdirs()
+//                        val outputFile = File(folder, fileName)
+//                        FileUtils.copyStreamToFile(inputStream!!, outputFile)
+//
+//                        binding.ivNote.setImageURI(Uri.fromFile(outputFile))
+//                        binding.ivNote.visibility = View.VISIBLE
 //                        binding.ivDeleteImage.visibility = View.VISIBLE
 //
+//                        selectedImagePath = outputFile.path
+//
 //                        viewModel.handleEvent(
-//                            NoteDetailEvent.OnImageButtonClick(getPathFromUri(selectedImageUri))
+//                            NoteDetailEvent.OnNoteImageChange(selectedImagePath)
 //                        )
 
-//                        selectedImagePath = getPathFromUri(selectedImageUri)
+                        binding.ivNote.setImageURI(selectedImageUri)
+                        binding.ivNote.visibility = View.VISIBLE
+
+                        binding.ivDeleteImage.visibility = View.VISIBLE
+
+                        viewModel.handleEvent(
+                            NoteDetailEvent.OnNoteImageChange(getPathFromUri(selectedImageUri))
+                        )
+
+                        selectedImagePath = getPathFromUri(selectedImageUri)
                     } catch (e: Exception) {
                         showErrorState(e.toString())
                     }
@@ -298,31 +292,32 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
-//    private fun getPathFromUri(contentUri: Uri): String {
-//        // contentResolver와 cursor에 대해 공부 필요!
-//        val filePath: String
-//        val cursor = contentResolver.query(contentUri, null, null, null, null)
-//        if (cursor == null) {
-//            filePath = contentUri.path.toString()
-//        } else {
-//            cursor.moveToFirst()
-//            val index = cursor.getColumnIndex("_data")
-//            filePath = cursor.getString(index)
-//            cursor.close()
-//        }
-//        return filePath
-//    }
+    private fun getPathFromUri(contentUri: Uri): String {
+        // contentResolver와 cursor에 대해 공부 필요!
+        val filePath: String
+        val cursor = contentResolver.query(contentUri, null, null, null, null)
+        if (cursor == null) {
+            filePath = contentUri.path.toString()
+        } else {
+            cursor.moveToFirst()
+            val index = cursor.getColumnIndex("_data")
+            filePath = cursor.getString(index)
+            cursor.close()
+        }
+        return filePath
+    }
 
     private fun selectImage() {
 
-//        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
-//            it.type = "image/*"
-//            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE) }
+        // private storage issue 때문에 이미지 복사
+//        Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
+//            it.type="image/*"
+//            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE)
+//        }
 
-        Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
-            it.type="image/*"
-            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE)
-        }
+        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
+            it.type = "image/*"
+            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE) }
 
     }
 
@@ -374,9 +369,6 @@ class NoteDetailActivity : AppCompatActivity() {
 
                 if(!note.imagePath.isNullOrEmpty()) {
                     showImage(note.imagePath)
-//                    binding.ivNote.setImageURI(Uri.parse(note.imagePath))
-//                    binding.ivNote.visibility = View.VISIBLE
-//                    binding.ivDeleteImage.visibility = View.VISIBLE
                 }
 
                 if (!note.color.isNullOrEmpty()){
@@ -406,10 +398,14 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.changedNoteImage.observe(
             this,
             Observer{ imagePath ->
-                selectedImagePath=imagePath // 얘를 이렇게 저장하면 안되는거?
+                if (!imagePath.isNullOrEmpty()) {
+                    selectedImagePath = imagePath // 얘를 이렇게 저장하면 안되는거?
 //                Log.i(TAG, "3 $selectedImagePath")
-
-                showImage(imagePath)
+                    showImage(imagePath)
+                } else {
+                    binding.ivNote.visibility = View.GONE
+                    binding.ivDeleteImage.visibility = View.GONE
+                }
                 Log.i(TAG, "viewModel.changedNoteImage.observe")
             }
         )
