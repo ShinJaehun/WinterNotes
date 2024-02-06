@@ -14,4 +14,5 @@ sealed class NoteDetailEvent {
     data class OnStart(val noteId: String): NoteDetailEvent()
     data class OnNoteColorChange(val color: String): NoteDetailEvent()
     data class OnNoteImageChange(val imagePath: String): NoteDetailEvent()
+    object OnNoteImageDeleteClick: NoteDetailEvent()
 }

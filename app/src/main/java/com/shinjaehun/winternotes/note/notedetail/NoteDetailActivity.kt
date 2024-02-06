@@ -273,10 +273,10 @@ class NoteDetailActivity : AppCompatActivity() {
 //                            NoteDetailEvent.OnNoteImageChange(selectedImagePath)
 //                        )
 
-                        binding.ivNote.setImageURI(selectedImageUri)
-                        binding.ivNote.visibility = View.VISIBLE
-
-                        binding.ivDeleteImage.visibility = View.VISIBLE
+                        showImage(selectedImagePath)
+//                        binding.ivNote.setImageURI(selectedImageUri)
+//                        binding.ivNote.visibility = View.VISIBLE
+//                        binding.ivDeleteImage.visibility = View.VISIBLE
 
                         viewModel.handleEvent(
                             NoteDetailEvent.OnNoteImageChange(getPathFromUri(selectedImageUri))
@@ -339,6 +339,11 @@ class NoteDetailActivity : AppCompatActivity() {
         binding.ivNote.setImageURI(Uri.parse(path))
         binding.ivNote.visibility = View.VISIBLE
         binding.ivDeleteImage.visibility = View.VISIBLE
+        binding.ivDeleteImage.setOnClickListener {
+            viewModel.handleEvent(
+                NoteDetailEvent.OnNoteImageDeleteClick
+            )
+        }
     }
 
     private fun setSubtitleIndicatorColor(selectedNoteColor: String) {
@@ -423,6 +428,16 @@ class NoteDetailActivity : AppCompatActivity() {
             this,
             Observer {
                 Log.i(TAG, "viewModel.deleted.observe")
+            }
+        )
+
+        viewModel.noteImageDeleted.observe(
+            this,
+            Observer {
+                selectedImagePath = ""
+                binding.ivNote.visibility = View.GONE
+                binding.ivDeleteImage.visibility = View.GONE
+                Log.i(TAG, "viewModel.noteImageDeleted.observe")
             }
         )
     }

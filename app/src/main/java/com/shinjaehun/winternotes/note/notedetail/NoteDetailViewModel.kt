@@ -33,6 +33,9 @@ class NoteDetailViewModel(
     private val noteImageState = MutableLiveData<String>()
     val noteImage: LiveData<String> get() = noteImageState
 
+    private val noteImageDeletedState = MutableLiveData<Boolean>()
+    val noteImageDeleted: LiveData<Boolean> get() = noteImageDeletedState
+
     override fun handleEvent(event: NoteDetailEvent) {
         when(event) {
             is NoteDetailEvent.OnStart -> getNote(event.noteId)
@@ -41,9 +44,27 @@ class NoteDetailViewModel(
 //            is NoteDetailEvent.OnDoneClick -> updateNote(event.note)
             is NoteDetailEvent.OnNoteColorChange -> changeNoteColor(event.color)
             is NoteDetailEvent.OnNoteImageChange -> changeNoteImage(event.imagePath)
+            is NoteDetailEvent.OnNoteImageDeleteClick -> onNoteImageDelete()
             else -> {}
         }
     }
+
+    private fun onNoteImageDelete() {
+        noteImageDeletedState.value = true
+        Log.i(TAG, "onNoteImageDelete()")
+    }
+
+    // 이렇게 하면 이미지 삭제 버튼을 클릭할 때 updateNote가 발생
+//    private fun onNoteImageDelete() = launch {
+//        val updateResult = noteRepo.insertOrUpdateNote(
+//            note.value!!.copy(imagePath = "")
+//        )
+//        when (updateResult) {
+//            is Result.Value -> updatedState.value = true
+//            is Result.Error -> updatedState.value = false
+//        }
+//        Log.i(TAG, "onNoteImageDelete()")
+//    }
 
     private fun changeNoteImage(imagePath: String) {
         noteImageState.value = imagePath
