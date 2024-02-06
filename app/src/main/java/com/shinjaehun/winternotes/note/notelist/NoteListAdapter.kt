@@ -1,6 +1,7 @@
 package com.shinjaehun.winternotes.note.notelist
 
 import android.graphics.Color
+import android.graphics.Color.BLACK
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.view.LayoutInflater
@@ -11,7 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.shinjaehun.winternotes.R
-import com.shinjaehun.winternotes.common.BLACK
+import com.shinjaehun.winternotes.common.ColorBLACK
 import com.shinjaehun.winternotes.common.simpleDate
 import com.shinjaehun.winternotes.databinding.ItemContainerNoteBinding
 import com.shinjaehun.winternotes.model.Note
@@ -63,7 +64,7 @@ class NoteListAdapter(
                 if (!this.color.isNullOrEmpty()) {
                     gradientDrawable.setColor(Color.parseColor(this.color))
                 } else {
-                    gradientDrawable.setColor(Color.parseColor(BLACK))
+                    gradientDrawable.setColor(Color.parseColor(ColorBLACK))
                 }
 
                 binding.layoutNote.setOnClickListener {

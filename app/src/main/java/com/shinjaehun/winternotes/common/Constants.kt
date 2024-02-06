@@ -1,5 +1,7 @@
 package com.shinjaehun.winternotes.common
 
+import com.shinjaehun.winternotes.R
+
 
 internal const val LOGIN_ERROR = "Error retrieving user."
 internal const val LOADING = "Loading..."
@@ -17,11 +19,12 @@ internal const val RETRY = "RETRY"
 //internal const val ANTENNA_FULL = "ic_antenna_full"
 //internal const val ANTENNA_LOOP = "antenna_loop_fast"
 
-internal const val BLACK = "#333333"
-internal const val PINK = "#FF1D8E"
-internal const val DARKBLUE = "#3a52Fc"
-internal const val YELLOW = "#F3DD5C"
-internal const val LIGHTBLUE = "#1AA7EC"
+internal const val ColorBLACK = "#333333"
+internal const val ColorPINK = "#FF1D8E"
+internal const val ColorDARKBLUE = "#3a52Fc"
+internal const val ColorYELLOW = "#F3DD5C"
+internal const val ColorLIGHTBLUE = "#1AA7EC"
+
 internal const val REQUEST_CODE_STORAGE_PERMISSION = 11
 internal const val REQUEST_CODE_SELECT_IMAGE = 12
 

@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shinjaehun.winternotes.R
 import com.shinjaehun.winternotes.common.*
-import com.shinjaehun.winternotes.common.BLACK
 import com.shinjaehun.winternotes.common.makeToast
 import com.shinjaehun.winternotes.common.toEditable
 import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
@@ -108,7 +107,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnNoteColorChange(BLACK)
+                NoteDetailEvent.OnNoteColorChange(ColorBLACK)
             )
         }
 
@@ -119,7 +118,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnNoteColorChange(PINK)
+                NoteDetailEvent.OnNoteColorChange(ColorPINK)
             )
         }
 
@@ -130,7 +129,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnNoteColorChange(DARKBLUE)
+                NoteDetailEvent.OnNoteColorChange(ColorDARKBLUE)
             )
         }
 
@@ -141,7 +140,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(R.drawable.ic_done)
             imageColor5.setImageResource(0)
             viewModel.handleEvent(
-                NoteDetailEvent.OnNoteColorChange(YELLOW)
+                NoteDetailEvent.OnNoteColorChange(ColorYELLOW)
             )
         }
 
@@ -152,7 +151,7 @@ class NoteDetailActivity : AppCompatActivity() {
             imageColor4.setImageResource(0)
             imageColor5.setImageResource(R.drawable.ic_done)
             viewModel.handleEvent(
-                NoteDetailEvent.OnNoteColorChange(LIGHTBLUE)
+                NoteDetailEvent.OnNoteColorChange(ColorLIGHTBLUE)
             )
         }
 
@@ -365,22 +364,22 @@ class NoteDetailActivity : AppCompatActivity() {
                 binding.etNoteSubtitle.text = note.subtitle.toEditable()
                 binding.etNoteContent.text = note.noteContents.toEditable()
 
-                selectedImagePath= note.imagePath.toString() // 이렇게 해도 되는 건가요????????
-
                 if(!note.imagePath.isNullOrEmpty()) {
+                    selectedImagePath= note.imagePath.toString() // 이렇게 해도 되는 건가요????????
                     showImage(note.imagePath)
                 }
 
                 if (!note.color.isNullOrEmpty()){
                     when(note.color){
-                        PINK->      binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color2).performClick()
-                        DARKBLUE->  binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color3).performClick()
-                        YELLOW->    binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color4).performClick()
-                        LIGHTBLUE-> binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color5).performClick()
+                        ColorPINK->      binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color2).performClick()
+                        ColorDARKBLUE->  binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color3).performClick()
+                        ColorYELLOW->    binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color4).performClick()
+                        ColorLIGHTBLUE-> binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color5).performClick()
                         else ->     binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color1).performClick()
                     }
                     setSubtitleIndicatorColor(note.color)
                 }
+
                 Log.i(TAG, "viewModel.note.observe")
             }
         )
@@ -395,7 +394,7 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         )
 
-        viewModel.changedNoteImage.observe(
+        viewModel.noteImage.observe(
             this,
             Observer{ imagePath ->
                 if (!imagePath.isNullOrEmpty()) {
@@ -406,17 +405,17 @@ class NoteDetailActivity : AppCompatActivity() {
                     binding.ivNote.visibility = View.GONE
                     binding.ivDeleteImage.visibility = View.GONE
                 }
-                Log.i(TAG, "viewModel.changedNoteImage.observe")
+                Log.i(TAG, "viewModel.noteImage.observe")
             }
         )
 
-        viewModel.changedNoteColor.observe(
+        viewModel.noteColor.observe(
             this,
             Observer { noteColor ->
 //                Log.i(TAG, "4 $selectedImagePath")
 
                 setSubtitleIndicatorColor(noteColor)
-                Log.i(TAG, "viewModel.changedNoteColor.observe")
+                Log.i(TAG, "viewModel.noteColor.observe")
             }
         )
 

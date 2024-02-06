@@ -28,9 +28,9 @@
     <color name="colorNoteSubtitleText">#FAFAFA</color>
     <color name="colorMiscBackground">#1F1F1F</color>
 
-    <color name="colorDefaultNoteColor">#333333</color>
-    <color name="colorNoteColor2">#FF1D8E</color>
-    <color name="colorNoteColor3">#3a52Fc</color>
-    <color name="colorNoteColor4">#F3DD5C</color>
-    <color name="colorNoteColor5">#1AA7EC</color>
+    <color name="NoteColorBLACK">#333333</color>
+    <color name="NoteColorPINK">#FF1D8E</color>
+    <color name="NoteColorDARKBLUE">#3a52Fc</color>
+    <color name="NoteColorYELLOW">#F3DD5C</color>
+    <color name="NoteColorLIGHTBLUE">#1AA7EC</color>
 </resources>

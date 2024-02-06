@@ -27,11 +27,11 @@ class NoteDetailViewModel(
     private val updatedState = MutableLiveData<Boolean>()
     val updated: LiveData<Boolean> get() = updatedState
 
-    private val changedNoteColorState = MutableLiveData<String>()
-    val changedNoteColor: LiveData<String> get() = changedNoteColorState
+    private val noteColorState = MutableLiveData<String>()
+    val noteColor: LiveData<String> get() = noteColorState
 
-    private val changedNoteImageState = MutableLiveData<String>()
-    val changedNoteImage: LiveData<String> get() = changedNoteImageState
+    private val noteImageState = MutableLiveData<String>()
+    val noteImage: LiveData<String> get() = noteImageState
 
     override fun handleEvent(event: NoteDetailEvent) {
         when(event) {
@@ -46,14 +46,14 @@ class NoteDetailViewModel(
     }
 
     private fun changeNoteImage(imagePath: String) {
-        changedNoteImageState.value = imagePath
+        noteImageState.value = imagePath
     }
 
     private fun changeNoteColor(color: String) {
 //        왜 activity를 열 때마다 note를 가지고 올 때마다 changedNoteColor가 발생하는 걸까?
-        Log.i(TAG, "${changedNoteColor.value}")
-        changedNoteColorState.value = color
-        Log.i(TAG, "$color")
+        Log.i(TAG, "changedNoteColor.value: ${noteColor.value}")
+        Log.i(TAG, "color: $color")
+        noteColorState.value = color
     }
 
     //    private fun updateNote(updatedNote: Note) = launch {
@@ -103,6 +103,6 @@ class NoteDetailViewModel(
     }
 
     private fun newNote() {
-        noteState.value = Note("0","", currentTime(), "", "", "", BLACK)
+        noteState.value = Note("0","", currentTime(), "", "", "", "")
     }
 }
