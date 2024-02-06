@@ -5,8 +5,9 @@ sealed class NoteDetailEvent {
         val title: String,
         val subTitle: String,
         val contents: String,
-        val imagePath: String,
-        val color: String
+        val imagePath: String?,
+        val color: String?,
+        val webLink: String?
         ): NoteDetailEvent()
 //    data class OnDoneClick(val note: Note): NoteDetailEvent()
     object OnDeleteClick: NoteDetailEvent()
@@ -14,5 +15,7 @@ sealed class NoteDetailEvent {
     data class OnStart(val noteId: String): NoteDetailEvent()
     data class OnNoteColorChange(val color: String): NoteDetailEvent()
     data class OnNoteImageChange(val imagePath: String): NoteDetailEvent()
+    data class OnWebLinkChange(val webLink: String): NoteDetailEvent()
     object OnNoteImageDeleteClick: NoteDetailEvent()
+    object OnNoteURLDeleteClick: NoteDetailEvent()
 }

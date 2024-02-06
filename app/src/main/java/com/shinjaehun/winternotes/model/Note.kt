@@ -8,5 +8,5 @@ data class Note (
     val noteContents: String,
     val imagePath: String?,
     val color: String?,
-//    val webLink: String?
+    val webLink: String?
 )

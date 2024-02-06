@@ -33,25 +33,41 @@ class NoteDetailViewModel(
     private val noteImageState = MutableLiveData<String>()
     val noteImage: LiveData<String> get() = noteImageState
 
+    private val webLinkState = MutableLiveData<String>()
+    val webLink: LiveData<String> get() = webLinkState
+
     private val noteImageDeletedState = MutableLiveData<Boolean>()
     val noteImageDeleted: LiveData<Boolean> get() = noteImageDeletedState
+
+    private val noteURLDeleteState = MutableLiveData<Boolean>()
+    val noteURLDeleted: LiveData<Boolean> get() = noteURLDeleteState
 
     override fun handleEvent(event: NoteDetailEvent) {
         when(event) {
             is NoteDetailEvent.OnStart -> getNote(event.noteId)
             is NoteDetailEvent.OnDeleteClick -> onDelete()
-            is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents, event.imagePath, event.color)
+            is NoteDetailEvent.OnDoneClick -> updateNote(event.title, event.subTitle, event.contents, event.imagePath, event.color, event.webLink)
 //            is NoteDetailEvent.OnDoneClick -> updateNote(event.note)
             is NoteDetailEvent.OnNoteColorChange -> changeNoteColor(event.color)
             is NoteDetailEvent.OnNoteImageChange -> changeNoteImage(event.imagePath)
+            is NoteDetailEvent.OnWebLinkChange -> changeWebLink(event.webLink)
             is NoteDetailEvent.OnNoteImageDeleteClick -> onNoteImageDelete()
+            is NoteDetailEvent.OnNoteURLDeleteClick -> onNoteURLDelete()
             else -> {}
         }
     }
 
+    private fun onNoteURLDelete() {
+        noteURLDeleteState.value = true
+    }
+
+    private fun changeWebLink(webLink: String) {
+        webLinkState.value=webLink
+    }
+
     private fun onNoteImageDelete() {
         noteImageDeletedState.value = true
-        Log.i(TAG, "onNoteImageDelete()")
+//        Log.i(TAG, "onNoteImageDelete()")
     }
 
     // 이렇게 하면 이미지 삭제 버튼을 클릭할 때 updateNote가 발생
@@ -78,7 +94,7 @@ class NoteDetailViewModel(
     }
 
     //    private fun updateNote(updatedNote: Note) = launch {
-    private fun updateNote(title: String, subTitle: String, contents: String, imagePath: String, color: String) = launch {
+    private fun updateNote(title: String, subTitle: String, contents: String, imagePath: String?, color: String?, webLink: String?) = launch {
 //        Log.i(TAG, "insertOrUpdateNote? noteId: ${note.value!!.noteId}")
 
         val updateResult = noteRepo.insertOrUpdateNote(
@@ -89,8 +105,9 @@ class NoteDetailViewModel(
                     dateTime = currentTime(),
                     subtitle = subTitle,
                     noteContents = contents,
-                    imagePath = imagePath,
-                    color = color
+                    imagePath = imagePath ?: "X", // for test
+                    color = color ?: "X", // for test
+                    webLink = webLink ?: "X" // for test
                 )
         )
 
@@ -124,6 +141,7 @@ class NoteDetailViewModel(
     }
 
     private fun newNote() {
-        noteState.value = Note("0","", currentTime(), "", "", "", "")
+        Log.i(TAG, "newNote: color is null") // async 작업이므로 viewModel.note.observe보다 늦게 실행될 수도 있음
+        noteState.value = Note("0","", currentTime(), "", "", null, null, null)
     }
 }

@@ -37,7 +37,7 @@ internal val RoomNote.toNote: Note
         this.noteContents,
         this.imagePath,
         this.color,
-//        this.webLink
+        this.webLink
     )
 
 internal val Note.toRoomNote: RoomNote
@@ -49,7 +49,7 @@ internal val Note.toRoomNote: RoomNote
         this.noteContents,
         this.imagePath,
         this.color,
-//        this.webLink
+        this.webLink
     )
 
 internal fun List<RoomNote>.toNoteListFromRoomNote(): List<Note> = this.flatMap {

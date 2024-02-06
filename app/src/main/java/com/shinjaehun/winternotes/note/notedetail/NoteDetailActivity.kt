@@ -3,16 +3,18 @@ package com.shinjaehun.winternotes.note.notedetail
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.util.Patterns
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -71,6 +73,7 @@ class NoteDetailActivity : AppCompatActivity() {
                         binding.etNoteContent.text.toString(),
                         selectedImagePath, // 일단 임시로 이렇게는 해놨는데... 이렇게 해도 되는건지는 모르겠음.
                         colorCode, //colorCode도 사실 저렇게 전역변수로 처리하면 될텐데 그렇게 하면 안되는거지?
+                        binding.tvWebUrl.text.toString()
 //                    Note(
 //                        //여기서 noteId를 어떻게 처리해야 할지 모르겠네...
 //                    )
@@ -226,7 +229,37 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     private fun showAddURLDialog() {
+        val builder = AlertDialog.Builder(this@NoteDetailActivity)
+        val view: View = LayoutInflater.from(this).inflate(
+            R.layout.layout_add_url,
+            findViewById(R.id.layout_addUrlContainer)
+        )
+        builder.setView(view)
+        val dialogAddURL: AlertDialog = builder.create()
+        if (dialogAddURL.window != null) {
+            dialogAddURL.window!!.setBackgroundDrawable(ColorDrawable(0))
+        }
+        val inputURL = view.findViewById<EditText>(R.id.et_url)
+        inputURL.requestFocus()
 
+        view.findViewById<TextView>(R.id.tv_AddUrl).setOnClickListener {
+            if (inputURL.text.toString().trim().isEmpty()){
+                showErrorState("Enter URL")
+            } else if (!Patterns.WEB_URL.matcher(inputURL.text.toString()).matches()){
+                showErrorState("Enter valid URL")
+            } else {
+                viewModel.handleEvent(
+                    NoteDetailEvent.OnWebLinkChange(inputURL.text.toString().trim())
+                )
+                dialogAddURL.dismiss()
+            }
+        }
+
+        view.findViewById<TextView>(R.id.tv_AddUrl_Cancel).setOnClickListener {
+            dialogAddURL.dismiss()
+        }
+
+        dialogAddURL.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -274,9 +307,6 @@ class NoteDetailActivity : AppCompatActivity() {
 //                        )
 
                         showImage(selectedImagePath)
-//                        binding.ivNote.setImageURI(selectedImageUri)
-//                        binding.ivNote.visibility = View.VISIBLE
-//                        binding.ivDeleteImage.visibility = View.VISIBLE
 
                         viewModel.handleEvent(
                             NoteDetailEvent.OnNoteImageChange(getPathFromUri(selectedImageUri))
@@ -346,6 +376,17 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun showURL(url: String){
+        binding.tvWebUrl.text = url
+        binding.layoutWebUrl.visibility = View.VISIBLE
+        binding.ivDeleteWebUrl.visibility = View.VISIBLE
+        binding.ivDeleteWebUrl.setOnClickListener {
+            viewModel.handleEvent(
+                NoteDetailEvent.OnNoteURLDeleteClick
+            )
+        }
+    }
+
     private fun setSubtitleIndicatorColor(selectedNoteColor: String) {
         val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
         gradientDrawable.setColor(Color.parseColor(selectedNoteColor))
@@ -369,11 +410,6 @@ class NoteDetailActivity : AppCompatActivity() {
                 binding.etNoteSubtitle.text = note.subtitle.toEditable()
                 binding.etNoteContent.text = note.noteContents.toEditable()
 
-                if(!note.imagePath.isNullOrEmpty()) {
-                    selectedImagePath= note.imagePath.toString() // 이렇게 해도 되는 건가요????????
-                    showImage(note.imagePath)
-                }
-
                 if (!note.color.isNullOrEmpty()){
                     when(note.color){
                         ColorPINK->      binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color2).performClick()
@@ -383,6 +419,19 @@ class NoteDetailActivity : AppCompatActivity() {
                         else ->     binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color1).performClick()
                     }
                     setSubtitleIndicatorColor(note.color)
+                    Log.i(TAG, "viewModel.note.observe color is ${note.color}")
+                } else {
+                    setSubtitleIndicatorColor(ColorBLACK) // 이렇게 하면... 항상 changeNoteColor()가 호출되지 않을까?
+                    Log.i(TAG, "viewModel.note.observe color is null")
+                }
+
+                if(!note.imagePath.isNullOrEmpty()) {
+                    selectedImagePath= note.imagePath.toString() // 이렇게 해도 되는 건가요????????
+                    showImage(note.imagePath)
+                }
+
+                if (!note.webLink.isNullOrEmpty()) {
+                    showURL(note.webLink)
                 }
 
                 Log.i(TAG, "viewModel.note.observe")
@@ -396,6 +445,15 @@ class NoteDetailActivity : AppCompatActivity() {
 
                 Log.i(TAG, "viewModel.update.observe")
                 finish()
+            }
+        )
+
+        viewModel.noteColor.observe(
+            this,
+            Observer { noteColor ->
+//                Log.i(TAG, "4 $selectedImagePath")
+                setSubtitleIndicatorColor(noteColor)
+                Log.i(TAG, "viewModel.noteColor.observe")
             }
         )
 
@@ -414,13 +472,11 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         )
 
-        viewModel.noteColor.observe(
+        viewModel.webLink.observe(
             this,
-            Observer { noteColor ->
-//                Log.i(TAG, "4 $selectedImagePath")
-
-                setSubtitleIndicatorColor(noteColor)
-                Log.i(TAG, "viewModel.noteColor.observe")
+            Observer { webLink ->
+                showURL(webLink)
+                Log.i(TAG, "viewModel.webLink.observe")
             }
         )
 
@@ -431,6 +487,7 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         )
 
+
         viewModel.noteImageDeleted.observe(
             this,
             Observer {
@@ -440,6 +497,17 @@ class NoteDetailActivity : AppCompatActivity() {
                 Log.i(TAG, "viewModel.noteImageDeleted.observe")
             }
         )
+
+        viewModel.noteURLDeleted.observe(
+            this,
+            Observer {
+                binding.tvWebUrl.text = ""
+                binding.tvWebUrl.visibility = View.GONE
+                binding.layoutWebUrl.visibility = View.GONE
+                Log.i(TAG, "viewModel.noteURLDeleted.observe")
+            }
+        )
+
     }
 
     private fun showErrorState(errorMessage: String?) = makeToast(errorMessage!!)
