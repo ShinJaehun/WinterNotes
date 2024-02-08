@@ -27,6 +27,10 @@ class NoteRepoImpl(
         return insertOrUpdateLocalNote(note)
     }
 
+    override suspend fun searchNote(keyword: String): Result<Exception, List<Note>> {
+        return searchLocalNote(keyword)
+    }
+
     private suspend fun getLocalNotes(): Result<Exception, List<Note>> = Result.build {
         local.getNotes().toNoteListFromRoomNote()
     }
@@ -43,5 +47,9 @@ class NoteRepoImpl(
     private suspend fun insertOrUpdateLocalNote(note: Note): Result<Exception, Unit> = Result.build {
         local.insertOrUpdateNote(note.toRoomNote)
         Unit
+    }
+
+    private suspend fun searchLocalNote(keyword: String): Result<Exception, List<Note>> = Result.build {
+        local.searchNote(keyword).toNoteListFromRoomNote()
     }
 }

@@ -8,6 +8,7 @@ import com.shinjaehun.winternotes.common.GET_NOTES_ERROR
 import com.shinjaehun.winternotes.common.Result
 import com.shinjaehun.winternotes.model.INoteRepository
 import com.shinjaehun.winternotes.model.Note
+import com.shinjaehun.winternotes.note.notedetail.NoteDetailEvent
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
@@ -24,13 +25,26 @@ class NoteListViewModel(
     private val editNoteState = MutableLiveData<String>()
     val editNote: LiveData<String> get() = editNoteState
 
+    private val searchTextState = MutableLiveData<List<Note>>()
+    val searchText: LiveData<List<Note>> get() = searchTextState
     override fun handleEvent(event: NoteListEvent) {
         when(event) {
 //            is NoteListEvent.OnNewNoteClick -> TODO()
             // fab을 클릭하면 NoteDetailActivity를 실행시키기만 하면 되므로(다른 로직 필요 없음) 걍 activity에서 event로 처리
             is NoteListEvent.OnStart ->getNotes()
             is NoteListEvent.OnNoteItemClick -> editNote(event.position)
+            is NoteListEvent.OnSearchTextChange -> changeSearchText(event.searchKeyword)
+
             else -> {}
+        }
+    }
+
+    private fun changeSearchText(searchKeyword: String) = launch {
+        val notesResult = noteRepo.searchNote(searchKeyword)
+
+        when(notesResult){
+            is Result.Value -> searchTextState.value = notesResult.value
+            is Result.Error -> errorState.value = GET_NOTES_ERROR
         }
     }
 

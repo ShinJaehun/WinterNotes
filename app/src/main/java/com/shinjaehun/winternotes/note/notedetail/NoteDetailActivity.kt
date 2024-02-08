@@ -69,11 +69,8 @@ class NoteDetailActivity : AppCompatActivity() {
                 val colorCode = String.format("#%06X", (0xFFFFFF and gradientDrawable.color!!.defaultColor!!));
                 // colorCode는 null 값을 가질 수 없음!
 
-                val webUrl: String?
-                if (binding.tvWebUrl.text.toString().isEmpty()) {
-                    webUrl = null
-                } else {
-                    webUrl = binding.tvWebUrl.text.toString()
+                val webUrl = binding.tvWebUrl.text.toString().ifEmpty {
+                    null
                 }
 
                 viewModel.handleEvent(
