@@ -10,7 +10,7 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE noteId = :noteId")
     suspend fun getNoteById(noteId: String): RoomNote
 
-    @Query("SELECT * FROM notes WHERE title LIKE '%' || :keyword || '%' OR subtitle LIKE '%' || :keyword || '%'")
+    @Query("SELECT * FROM notes WHERE title LIKE '%' || :keyword || '%' OR subtitle LIKE '%' || :keyword || '%' OR note_contents LIKE '%' || :keyword || '%'")
     suspend fun searchNote(keyword: String): List<RoomNote>
     @Delete
     suspend fun deleteNote(note: RoomNote)
