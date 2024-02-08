@@ -14,8 +14,8 @@ sealed class NoteDetailEvent {
     object OnDeleteConfirmed: NoteDetailEvent()
     data class OnStart(val noteId: String): NoteDetailEvent()
     data class OnNoteColorChange(val color: String): NoteDetailEvent()
-    data class OnNoteImageChange(val imagePath: String): NoteDetailEvent()
-    data class OnWebLinkChange(val webLink: String): NoteDetailEvent()
+    data class OnNoteImageChange(val imagePath: String?): NoteDetailEvent()
+    data class OnWebLinkChange(val webLink: String?): NoteDetailEvent()
     object OnNoteImageDeleteClick: NoteDetailEvent()
     object OnNoteURLDeleteClick: NoteDetailEvent()
 }

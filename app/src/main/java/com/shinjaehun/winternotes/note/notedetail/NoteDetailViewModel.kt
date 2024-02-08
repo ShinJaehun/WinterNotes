@@ -61,34 +61,22 @@ class NoteDetailViewModel(
         noteURLDeleteState.value = true
     }
 
-    private fun changeWebLink(webLink: String) {
+    private fun changeWebLink(webLink: String?) {
         webLinkState.value=webLink
     }
 
     private fun onNoteImageDelete() {
         noteImageDeletedState.value = true
-//        Log.i(TAG, "onNoteImageDelete()")
     }
 
-    // 이렇게 하면 이미지 삭제 버튼을 클릭할 때 updateNote가 발생
-//    private fun onNoteImageDelete() = launch {
-//        val updateResult = noteRepo.insertOrUpdateNote(
-//            note.value!!.copy(imagePath = "")
-//        )
-//        when (updateResult) {
-//            is Result.Value -> updatedState.value = true
-//            is Result.Error -> updatedState.value = false
-//        }
-//        Log.i(TAG, "onNoteImageDelete()")
-//    }
-
-    private fun changeNoteImage(imagePath: String) {
+    private fun changeNoteImage(imagePath: String?) {
         noteImageState.value = imagePath
     }
 
     private fun changeNoteColor(color: String) {
 //        왜 activity를 열 때마다 note를 가지고 올 때마다 changedNoteColor가 발생하는 걸까?
         Log.i(TAG, "changedNoteColor.value: ${noteColor.value}")
+        // color를 ""로 초기화했지만 어쨌든 LiveData는 기본값이 null
         Log.i(TAG, "color: $color")
         noteColorState.value = color
     }
@@ -105,9 +93,10 @@ class NoteDetailViewModel(
                     dateTime = currentTime(),
                     subtitle = subTitle,
                     noteContents = contents,
-                    imagePath = imagePath ?: "X", // for test
-                    color = color ?: "X", // for test
-                    webLink = webLink ?: "X" // for test
+//                    imagePath = imagePath ?: "X", // for test
+                    imagePath = imagePath,
+                    color = color,
+                    webLink = webLink
                 )
         )
 
@@ -141,7 +130,7 @@ class NoteDetailViewModel(
     }
 
     private fun newNote() {
-        Log.i(TAG, "newNote: color is null") // async 작업이므로 viewModel.note.observe보다 늦게 실행될 수도 있음
+//        Log.i(TAG, "newNote: color is null") // async 작업이므로 viewModel.note.observe보다 늦게 실행될 수도 있음
         noteState.value = Note("0","", currentTime(), "", "", null, null, null)
     }
 }

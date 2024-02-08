@@ -9,6 +9,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
@@ -25,6 +26,7 @@ import com.shinjaehun.winternotes.common.*
 import com.shinjaehun.winternotes.common.makeToast
 import com.shinjaehun.winternotes.common.toEditable
 import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
+import java.io.File
 
 private const val TAG = "NoteDetailActivity"
 class NoteDetailActivity : AppCompatActivity() {
@@ -32,7 +34,7 @@ class NoteDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteDetailBinding
     private lateinit var viewModel: NoteDetailViewModel
 
-    private var selectedImagePath: String = ""
+    private var selectedImagePath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +67,14 @@ class NoteDetailActivity : AppCompatActivity() {
 
                 val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
                 val colorCode = String.format("#%06X", (0xFFFFFF and gradientDrawable.color!!.defaultColor!!));
+                // colorCode는 null 값을 가질 수 없음!
+
+                val webUrl: String?
+                if (binding.tvWebUrl.text.toString().isEmpty()) {
+                    webUrl = null
+                } else {
+                    webUrl = binding.tvWebUrl.text.toString()
+                }
 
                 viewModel.handleEvent(
                     NoteDetailEvent.OnDoneClick(
@@ -73,7 +83,8 @@ class NoteDetailActivity : AppCompatActivity() {
                         binding.etNoteContent.text.toString(),
                         selectedImagePath, // 일단 임시로 이렇게는 해놨는데... 이렇게 해도 되는건지는 모르겠음.
                         colorCode, //colorCode도 사실 저렇게 전역변수로 처리하면 될텐데 그렇게 하면 안되는거지?
-                        binding.tvWebUrl.text.toString()
+                         // 얘는 빈 값일때 그냥 null로 처리했으면 좋겠는데...
+                        webUrl
 //                    Note(
 //                        //여기서 noteId를 어떻게 처리해야 할지 모르겠네...
 //                    )
@@ -158,47 +169,8 @@ class NoteDetailActivity : AppCompatActivity() {
             )
         }
 
-//        viewModel.note.value. 뭐 이런 식으로 접근하면 안된데요...
-
         binding.misc.layoutAddImage.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-            // Register ActivityResult handler
-//            val requestPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
-//
-//            }
-
-//            // Permission request logic
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-//                requestPermissions.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_VIDEO, READ_MEDIA_VISUAL_USER_SELECTED))
-//            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                requestPermissions.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_VIDEO))
-//            } else {
-//                requestPermissions.launch(arrayOf(READ_EXTERNAL_STORAGE))
-//            }
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                requestPermissions.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_VIDEO))
-//            } else {
-//                requestPermissions.launch(arrayOf(READ_EXTERNAL_STORAGE))
-//            }
-//
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-//                (ContextCompat.checkSelfPermission(applicationContext, READ_MEDIA_IMAGES) == PERMISSION_GRANTED ||
-//                        ContextCompat.checkSelfPermission(applicationContext, READ_MEDIA_VIDEO) == PERMISSION_GRANTED
-//                        )
-//            ) {
-//                // Full access on Android 13 (API level 33) or higher
-//            } else if (
-//                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
-//                ContextCompat.checkSelfPermission(context, READ_MEDIA_VISUAL_USER_SELECTED) == PERMISSION_GRANTED
-//            ) {
-//                // Partial access on Android 14 (API level 34) or higher
-//            }  else if (ContextCompat.checkSelfPermission(context, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED) {
-//                // Full access up to Android 12 (API level 32)
-//            } else {
-//                // Access denied
-//            }
 
             if (ContextCompat.checkSelfPermission(
                     applicationContext,
@@ -219,13 +191,35 @@ class NoteDetailActivity : AppCompatActivity() {
             showAddURLDialog()
         }
 
-//        if (alreadyAvailableNote != null) {
-//            activityCreateNoteBinding.misc.layoutDeleteNote.visibility = View.VISIBLE
-//            activityCreateNoteBinding.misc.layoutDeleteNote.setOnClickListener {
-//                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-//                showDeleteNoteDialog()
-//            }
-//        }
+        binding.misc.layoutDeleteNote.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            showDeleteNoteDialog()
+        }
+
+
+    }
+
+    private fun showDeleteNoteDialog() {
+        val builder = AlertDialog.Builder(this@NoteDetailActivity)
+        val view: View = LayoutInflater.from(this).inflate(
+            R.layout.layout_delete_note,
+            findViewById(R.id.layout_DeleteNoteContainer)
+        )
+        builder.setView(view)
+        val dialogDeleteNote: AlertDialog = builder.create()
+        if (dialogDeleteNote.window != null) {
+            dialogDeleteNote.window!!.setBackgroundDrawable(ColorDrawable(0))
+        }
+        view.findViewById<TextView>(R.id.tv_DeleteNote).setOnClickListener {
+            viewModel.handleEvent(
+                NoteDetailEvent.OnDeleteClick
+            )
+            dialogDeleteNote.dismiss()
+        }
+        view.findViewById<TextView>(R.id.tv_DeleteNote_Cancel).setOnClickListener {
+            dialogDeleteNote.dismiss()
+        }
+        dialogDeleteNote.show()
     }
 
     private fun showAddURLDialog() {
@@ -264,55 +258,57 @@ class NoteDetailActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         var fileName = ""
+
         if (requestCode == REQUEST_CODE_SELECT_IMAGE) {
             if (data != null) {
                 val selectedImageUri = data.data
                 // 이건 official document에서 보장하는 내용
-//                selectedImageUri.let { returnUri ->
-//                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
-//                }?.use { cursor ->
-//                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-//                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-//                    cursor.moveToFirst()
-//                    Log.i(TAG, "${cursor.getString(nameIndex)}")
-//                    Log.i(TAG, "${cursor.getString(sizeIndex)}")
-//                    fileName = cursor.getString(nameIndex)
-//                }
+                selectedImageUri.let { returnUri ->
+                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
+                }?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                    cursor.moveToFirst()
+                    Log.i(TAG, "${cursor.getString(nameIndex)}")
+                    Log.i(TAG, "${cursor.getString(sizeIndex)}")
+                    fileName = cursor.getString(nameIndex)
+                }
 
 //                Log.i(TAG, "onActivityResult: $selectedImageUri")
                 if (selectedImageUri != null) {
-//                    Log.i(TAG, "onActivityResult: ${selectedImageUri!!.path!!.substring(selectedImageUri!!.path!!.lastIndexOf('/') + 1)}")
+                    Log.i(TAG, "onActivityResult: ${selectedImageUri!!.path!!.substring(selectedImageUri!!.path!!.lastIndexOf('/') + 1)}")
 
                     try {
                         // private storage issue 때문에 이미지 복사
-//                        FileUtils.application = application
-//                        FileUtils.cRes = contentResolver
-//
-//                        val inputStream = FileUtils.getInputStream(selectedImageUri)
-//                        val path = this.getExternalFilesDir(null)
-//                        val folder = File(path, "images")
-//                        folder.mkdirs()
-//                        val outputFile = File(folder, fileName)
-//                        FileUtils.copyStreamToFile(inputStream!!, outputFile)
-//
-//                        binding.ivNote.setImageURI(Uri.fromFile(outputFile))
-//                        binding.ivNote.visibility = View.VISIBLE
-//                        binding.ivDeleteImage.visibility = View.VISIBLE
-//
-//                        selectedImagePath = outputFile.path
-//
-//                        viewModel.handleEvent(
-//                            NoteDetailEvent.OnNoteImageChange(selectedImagePath)
-//                        )
+                        FileUtils.application = application
+                        FileUtils.cRes = contentResolver
 
-                        showImage(selectedImagePath)
+                        val inputStream = FileUtils.getInputStream(selectedImageUri)
+                        val path = this.getExternalFilesDir(null)
+                        val folder = File(path, "images")
+                        folder.mkdirs()
+                        val outputFile = File(folder, fileName)
+                        FileUtils.copyStreamToFile(inputStream!!, outputFile)
+
+                        binding.ivNote.setImageURI(Uri.fromFile(outputFile))
+                        binding.ivNote.visibility = View.VISIBLE
+                        binding.ivDeleteImage.visibility = View.VISIBLE
+
+                        selectedImagePath = outputFile.path
 
                         viewModel.handleEvent(
-                            NoteDetailEvent.OnNoteImageChange(getPathFromUri(selectedImageUri))
+                            NoteDetailEvent.OnNoteImageChange(selectedImagePath!!)
                         )
 
-                        selectedImagePath = getPathFromUri(selectedImageUri)
+//                        showImage(selectedImagePath!!)
+//
+//                        viewModel.handleEvent(
+//                            NoteDetailEvent.OnNoteImageChange(getPathFromUri(selectedImageUri))
+//                        )
+//
+//                        selectedImagePath = getPathFromUri(selectedImageUri)
                     } catch (e: Exception) {
                         showErrorState(e.toString())
                     }
@@ -321,32 +317,31 @@ class NoteDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun getPathFromUri(contentUri: Uri): String {
-        // contentResolver와 cursor에 대해 공부 필요!
-        val filePath: String
-        val cursor = contentResolver.query(contentUri, null, null, null, null)
-        if (cursor == null) {
-            filePath = contentUri.path.toString()
-        } else {
-            cursor.moveToFirst()
-            val index = cursor.getColumnIndex("_data")
-            filePath = cursor.getString(index)
-            cursor.close()
-        }
-        return filePath
-    }
+//    private fun getPathFromUri(contentUri: Uri): String {
+//        // contentResolver와 cursor에 대해 공부 필요!
+//        val filePath: String
+//        val cursor = contentResolver.query(contentUri, null, null, null, null)
+//        if (cursor == null) {
+//            filePath = contentUri.path.toString()
+//        } else {
+//            cursor.moveToFirst()
+//            val index = cursor.getColumnIndex("_data")
+//            filePath = cursor.getString(index)
+//            cursor.close()
+//        }
+//        return filePath
+//    }
 
     private fun selectImage() {
-
         // private storage issue 때문에 이미지 복사
-//        Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
-//            it.type="image/*"
-//            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE)
-//        }
+        Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
+            it.type="image/*"
+            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE)
+        }
 
-        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
-            it.type = "image/*"
-            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE) }
+//        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
+//            it.type = "image/*"
+//            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE) }
 
     }
 
@@ -403,8 +398,6 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.note.observe(
             this,
             Observer { note ->
-//                Log.i(TAG, "1 $selectedImagePath")
-
                 binding.etNoteTitle.text = note.title.toEditable()
                 binding.tvDateTime.text = note.dateTime
                 binding.etNoteSubtitle.text = note.subtitle.toEditable()
@@ -419,10 +412,10 @@ class NoteDetailActivity : AppCompatActivity() {
                         else ->     binding.misc.layoutMisc.findViewById<ImageView>(R.id.iv_color1).performClick()
                     }
                     setSubtitleIndicatorColor(note.color)
-                    Log.i(TAG, "viewModel.note.observe color is ${note.color}")
+//                    Log.i(TAG, "viewModel.note.observe color is ${note.color}")
                 } else {
                     setSubtitleIndicatorColor(ColorBLACK) // 이렇게 하면... 항상 changeNoteColor()가 호출되지 않을까?
-                    Log.i(TAG, "viewModel.note.observe color is null")
+//                    Log.i(TAG, "viewModel.note.observe color is null")
                 }
 
                 if(!note.imagePath.isNullOrEmpty()) {
@@ -432,6 +425,10 @@ class NoteDetailActivity : AppCompatActivity() {
 
                 if (!note.webLink.isNullOrEmpty()) {
                     showURL(note.webLink)
+                }
+
+                if (note.noteId != "0") {
+                    binding.misc.layoutDeleteNote.visibility = View.VISIBLE
                 }
 
                 Log.i(TAG, "viewModel.note.observe")
@@ -483,6 +480,7 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.deleted.observe(
             this,
             Observer {
+                finish()
                 Log.i(TAG, "viewModel.deleted.observe")
             }
         )
@@ -508,6 +506,13 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         )
 
+        viewModel.deleted.observe(
+            this,
+            Observer {
+
+                Log.i(TAG, "viewModel.deleted.observe")
+            }
+        )
     }
 
     private fun showErrorState(errorMessage: String?) = makeToast(errorMessage!!)
