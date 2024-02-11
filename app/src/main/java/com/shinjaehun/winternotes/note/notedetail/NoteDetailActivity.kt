@@ -34,7 +34,7 @@ class NoteDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteDetailBinding
     private lateinit var viewModel: NoteDetailViewModel
 
-    private var selectedImagePath: String? = null
+//    private var selectedImagePath: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +64,9 @@ class NoteDetailActivity : AppCompatActivity() {
             } else if (binding.etNoteContent.text.toString().trim().isEmpty()) {
                 showErrorState("Note content can't be empty")
             } else {
+
+                val selectedImagePath: String? = binding.ivNote.tag as String?
+                Log.i(TAG, "$selectedImagePath")
 
                 val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
                 val colorCode = String.format("#%06X", (0xFFFFFF and gradientDrawable.color!!.defaultColor!!));
@@ -266,10 +269,10 @@ class NoteDetailActivity : AppCompatActivity() {
                     returnUri?.let { contentResolver.query(it, null, null, null, null) }
                 }?.use { cursor ->
                     val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+//                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
                     cursor.moveToFirst()
-                    Log.i(TAG, "${cursor.getString(nameIndex)}")
-                    Log.i(TAG, "${cursor.getString(sizeIndex)}")
+//                    Log.i(TAG, "${cursor.getString(nameIndex)}")
+//                    Log.i(TAG, "${cursor.getString(sizeIndex)}")
                     fileName = cursor.getString(nameIndex)
                 }
 
@@ -293,10 +296,11 @@ class NoteDetailActivity : AppCompatActivity() {
                         binding.ivNote.visibility = View.VISIBLE
                         binding.ivDeleteImage.visibility = View.VISIBLE
 
-                        selectedImagePath = outputFile.path
+                        binding.ivNote.tag = outputFile.path
+//                        selectedImagePath = outputFile.path
 
                         viewModel.handleEvent(
-                            NoteDetailEvent.OnNoteImageChange(selectedImagePath!!)
+                            NoteDetailEvent.OnNoteImageChange(outputFile.path)
                         )
 
 //                        showImage(selectedImagePath!!)
@@ -416,7 +420,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 }
 
                 if(!note.imagePath.isNullOrEmpty()) {
-                    selectedImagePath= note.imagePath.toString() // 이렇게 해도 되는 건가요????????
+//                    selectedImagePath= note.imagePath.toString() // 이렇게 해도 되는 건가요????????
                     showImage(note.imagePath)
                 }
 
@@ -455,7 +459,7 @@ class NoteDetailActivity : AppCompatActivity() {
             this,
             Observer{ imagePath ->
                 if (!imagePath.isNullOrEmpty()) {
-                    selectedImagePath = imagePath // 얘를 이렇게 저장하면 안되는거?
+//                    selectedImagePath = imagePath // 얘를 이렇게 저장하면 안되는거?
 //                Log.i(TAG, "3 $selectedImagePath")
                     showImage(imagePath)
                 } else {
@@ -486,7 +490,6 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.noteImageDeleted.observe(
             this,
             Observer {
-                selectedImagePath = ""
                 binding.ivNote.visibility = View.GONE
                 binding.ivDeleteImage.visibility = View.GONE
                 Log.i(TAG, "viewModel.noteImageDeleted.observe")
@@ -506,7 +509,6 @@ class NoteDetailActivity : AppCompatActivity() {
         viewModel.deleted.observe(
             this,
             Observer {
-
                 Log.i(TAG, "viewModel.deleted.observe")
             }
         )
