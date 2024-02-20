@@ -40,15 +40,6 @@ class NoteDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteDetailBinding
     private lateinit var viewModel: NoteDetailViewModel
 
-//    private var selectedImagePath: String? = null
-
-//    private val readExternal=READ_EXTERNAL_STORAGE
-//    private val readVideo=READ_MEDIA_VIDEO
-//    private val readImages=READ_MEDIA_IMAGES
-//    private val permissions= arrayOf(
-//        readVideo,readImages
-//    )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNoteDetailBinding.inflate(layoutInflater)
@@ -193,135 +184,6 @@ class NoteDetailActivity : AppCompatActivity() {
             } else {
                 selectImage()
             }
-
-//            when {
-//                ContextCompat.checkSelfPermission(
-//                    this,
-//                    READ_MEDIA_IMAGES
-//                ) == PackageManager.PERMISSION_GRANTED -> {
-//                    // You can use the API that requires the permission.
-//                    Toast.makeText(this, "Read media images permission granted", Toast.LENGTH_SHORT).show()
-//                    selectImage()
-//                }
-//                ActivityCompat.shouldShowRequestPermissionRationale(
-//                    this, READ_MEDIA_IMAGES) -> {
-//                    // In an educational UI, explain to the user why your app requires this
-//                    // permission for a specific feature to behave as expected, and what
-//                    // features are disabled if it's declined. In this UI, include a
-//                    // "cancel" or "no thanks" button that lets the user continue
-//                    // using your app without granting the permission.
-//                    AlertDialog.Builder(this)
-//                        .setTitle("Storage Permission")
-//                        .setMessage("Storage permission is needed in order to show images and videos")
-//                        .setNegativeButton("Cancel"){dialog,_->
-//                            Toast.makeText(this, "Read media storage permission denied!", Toast.LENGTH_SHORT).show()
-//                            dialog.dismiss()
-//                        }
-//                        .setPositiveButton("OK"){_,_->
-//                            requestPermissionLauncher.launch(READ_MEDIA_IMAGES)
-//                        }
-//                        .show()
-//                }
-//                else -> {
-//                    // You can directly ask for the permission.
-//                    // The registered ActivityResultCallback gets the result of this request.
-//                    requestPermissionLauncher.launch(
-//                        READ_MEDIA_IMAGES)
-//                }
-//            }
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-//                val notGrantedPermissions=permissions.filterNot { permission->
-//                    Log.i(TAG, "not granted permission: ${permission}")
-//                    ContextCompat.checkSelfPermission(this,permission) == PackageManager.PERMISSION_GRANTED
-//                }
-//                if (notGrantedPermissions.isNotEmpty()){
-//                    val showRationale=notGrantedPermissions.any { permission->
-//                        Log.i(TAG, "rationale permission: ${permission}")
-//
-//                        shouldShowRequestPermissionRationale(permission)
-//                    }
-//                    if (showRationale){
-//                        AlertDialog.Builder(this)
-//                            .setTitle("Storage Permission")
-//                            .setMessage("Storage permission is needed in order to show images and videos")
-//                            .setNegativeButton("Cancel"){dialog,_->
-//                                Toast.makeText(this, "Read media storage permission denied!", Toast.LENGTH_SHORT).show()
-//                                dialog.dismiss()
-//                            }
-//                            .setPositiveButton("OK"){_,_->
-//                                videoImagesPermission.launch(notGrantedPermissions.toTypedArray())
-//                            }
-//                            .show()
-//                    }else{
-//                        videoImagesPermission.launch(notGrantedPermissions.toTypedArray())
-//                    }
-//                }else{
-//                    Toast.makeText(this, "Read media storage permission granted", Toast.LENGTH_SHORT).show()
-//                    selectImage()
-//                }
-//            }else{
-//                if (ContextCompat.checkSelfPermission(this,readExternal) == PackageManager.PERMISSION_GRANTED){
-//                    Toast.makeText(this, "Read external storage permission granted", Toast.LENGTH_SHORT).show()
-//                    selectImage()
-//                }else{
-//                    if (shouldShowRequestPermissionRationale(readExternal)){
-//                        AlertDialog.Builder(this)
-//                            .setTitle("Storage Permission")
-//                            .setMessage("Storage permission is needed in order to show images and video")
-//                            .setNegativeButton("Cancel"){dialog,_->
-//                                Toast.makeText(this, "Read external storage permission denied!", Toast.LENGTH_SHORT).show()
-//                                dialog.dismiss()
-//                            }
-//                            .setPositiveButton("OK"){_,_->
-//                                readExternalPermission.launch(readExternal)
-//                            }
-//                            .show()
-//                    }else{
-//                        readExternalPermission.launch(readExternal)
-//                    }
-//                }
-//            }
-
-//            val requestPermissionLauncher = registerForActivityResult(
-//                ActivityResultContracts.RequestMultiplePermissions()
-//            ) { permissions ->
-//                if (permissions.getOrDefault(android.Manifest.permission.READ_MEDIA_IMAGES, false)) {
-//                    // Permission granted
-//                } else {
-//                    // Handle permission denial
-//                }
-//            }
-//
-//            if (ContextCompat.checkSelfPermission(
-//                    applicationContext,
-//                    android.Manifest.permission.READ_MEDIA_IMAGES
-//                )
-//                != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                ActivityCompat.requestPermissions(
-//                    this@NoteDetailActivity,
-//                    arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES),
-//                    REQUEST_CODE_STORAGE_PERMISSION
-//                )
-//                requestPermissionLauncher.launch(
-//                    arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES)
-//                )
-//            } else {
-//                selectImage()
-//            }
-
-
-//            if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)
-//                == PackageManager.PERMISSION_GRANTED) {
-////                showDialog("Permission granted")
-//                Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show()
-//                selectImage()
-//            } else {
-//                requestPermissions(arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES),
-//                    REQUEST_CODE_STORAGE_PERMISSION)
-//            }
-
         }
 
         binding.misc.layoutAddUrl.setOnClickListener {
@@ -336,65 +198,6 @@ class NoteDetailActivity : AppCompatActivity() {
 
 
     }
-
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-//            when (requestCode) {
-//                100 -> {
-//                    Toast.makeText(this, "permissions granted", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        } else {
-//
-//        }
-//    }
-
-
-    val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                // Permission is granted. Continue the action or workflow in your
-                // app.
-                Toast.makeText(this, "Media permissions granted", Toast.LENGTH_SHORT).show()
-            } else {
-                // Explain to the user that the feature is unavailable because the
-                // feature requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
-                Toast.makeText(this, "Media permissions not granted!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-//    private val videoImagesPermission=registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissionMap->
-//        if (permissionMap.all { it.value }){
-//            Toast.makeText(this, "Media permissions granted", Toast.LENGTH_SHORT).show()
-//        }else{
-//            Toast.makeText(this, "Media permissions not granted!", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//    private val readExternalPermission=registerForActivityResult(ActivityResultContracts.RequestPermission()){isGranted->
-//        if (isGranted){
-//            Toast.makeText(this, "Read external storage permission granted", Toast.LENGTH_SHORT).show()
-//        }else{
-//            Toast.makeText(this, "Read external storage permission denied!", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-
-//    private fun showDialog(msg: String) {
-//        val builder = AlertDialog.Builder(this)
-//        builder.setTitle("Dialog")
-//            .setMessage(msg)
-//        val dialog = builder.create()
-//        dialog.show()
-//    }
 
     private fun showDeleteNoteDialog() {
         val builder = AlertDialog.Builder(this@NoteDetailActivity)
@@ -537,15 +340,9 @@ class NoteDetailActivity : AppCompatActivity() {
             startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE)
         }
 
-//        Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
-//            it.type="image/*"
-//            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE)
-//        }
-
 //        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also {
 //            it.type = "image/*"
 //            startActivityForResult(it, REQUEST_CODE_SELECT_IMAGE) }
-
     }
 
     override fun onRequestPermissionsResult(
@@ -559,7 +356,6 @@ class NoteDetailActivity : AppCompatActivity() {
             REQUEST_CODE_STORAGE_PERMISSION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "Permission granted?")
-//                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show()
                     selectImage()
                 } else {
                     Log.d(TAG, "User declined and i can't ask")
@@ -567,27 +363,6 @@ class NoteDetailActivity : AppCompatActivity() {
                 }
             }
         }
-
-//        when(requestCode){
-//            REQUEST_CODE_STORAGE_PERMISSION -> {
-//                if (grantResults.isEmpty()) {
-//                    throw RuntimeException("Empty permission result")
-//                }
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    Log.d(TAG, "Permission granted?")
-////                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show()
-//                    selectImage()
-//                } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.READ_MEDIA_IMAGES)) {
-//                    Log.d(TAG, "User declined, but i can still ask for more")
-//
-//                    requestPermissions(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_VIDEO),
-//                    REQUEST_CODE_STORAGE_PERMISSION)
-//                } else {
-//                    Log.d(TAG, "User declined and i can't ask")
-//                    showDialogToGetPermission()
-//                }
-//            }
-//        }
     }
 
     private fun showDialogToGetPermission() {
