@@ -9,9 +9,11 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION_CODES.P
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.MediaStore.Audio.Media
 import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Log
@@ -70,7 +72,7 @@ class NoteDetailActivity : AppCompatActivity() {
             } else {
 
                 val selectedImagePath: String? = binding.ivNote.tag as String?
-                Log.i(TAG, "$selectedImagePath")
+                Log.i(TAG, "selectedImagePath: $selectedImagePath")
 
                 val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
                 val colorCode = String.format("#%06X", (0xFFFFFF and gradientDrawable.color!!.defaultColor!!));
@@ -195,8 +197,6 @@ class NoteDetailActivity : AppCompatActivity() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             showDeleteNoteDialog()
         }
-
-
     }
 
     private fun showDeleteNoteDialog() {
@@ -259,12 +259,29 @@ class NoteDetailActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+//        var filePath = ""
         var fileName = ""
 
         if (requestCode == REQUEST_CODE_SELECT_IMAGE) {
             if (data != null) {
                 val selectedImageUri = data.data
-                // 이건 official document에서 보장하는 내용
+
+                // 이게 정상적으로 동작하긴 하는데... playstore에서 정책적으로 reject할 것이다.
+//                selectedImageUri.let { returnUri ->
+//                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
+//                }?.use { cursor ->
+//                    val idx = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+//                    cursor.moveToFirst()
+//                    filePath = cursor.getString(idx)
+//                }
+//
+//                binding.ivNote.tag = filePath
+//                showImage(filePath)
+//
+//                viewModel.handleEvent(
+//                    NoteDetailEvent.OnNoteImageChange(filePath)
+//                )
+
                 selectedImageUri.let { returnUri ->
                     returnUri?.let { contentResolver.query(it, null, null, null, null) }
                 }?.use { cursor ->
@@ -276,7 +293,6 @@ class NoteDetailActivity : AppCompatActivity() {
                     fileName = cursor.getString(nameIndex)
                 }
 
-//                Log.i(TAG, "onActivityResult: $selectedImageUri")
                 if (selectedImageUri != null) {
                     Log.i(TAG, "onActivityResult: ${selectedImageUri!!.path!!.substring(selectedImageUri!!.path!!.lastIndexOf('/') + 1)}")
 
@@ -292,12 +308,9 @@ class NoteDetailActivity : AppCompatActivity() {
                         val outputFile = File(folder, fileName)
                         FileUtils.copyStreamToFile(inputStream!!, outputFile)
 
-                        binding.ivNote.setImageURI(Uri.fromFile(outputFile))
-                        binding.ivNote.visibility = View.VISIBLE
-                        binding.ivDeleteImage.visibility = View.VISIBLE
+                        showImage(outputFile.path)
 
                         binding.ivNote.tag = outputFile.path
-//                        selectedImagePath = outputFile.path
 
                         viewModel.handleEvent(
                             NoteDetailEvent.OnNoteImageChange(outputFile.path)
@@ -388,6 +401,18 @@ class NoteDetailActivity : AppCompatActivity() {
         binding.ivNote.visibility = View.VISIBLE
         binding.ivDeleteImage.visibility = View.VISIBLE
         binding.ivDeleteImage.setOnClickListener {
+
+            // 이미지 삭제 버튼 누르면: 여기서 tag가 null인 이유는 무엇인가?
+//            val imagePath: String? = binding.ivNote.tag as String?
+//            Log.i(TAG, "imagePath: ${binding.ivNote.tag}")
+//            if (!imagePath.isNullOrEmpty()) {
+//                File(imagePath).delete()
+//            }
+//            binding.ivNote.tag = null
+            if (File(path).exists()) {
+                File(path).delete()
+            }
+
             viewModel.handleEvent(
                 NoteDetailEvent.OnNoteImageDeleteClick
             )
@@ -514,6 +539,7 @@ class NoteDetailActivity : AppCompatActivity() {
             Observer {
                 binding.ivNote.visibility = View.GONE
                 binding.ivDeleteImage.visibility = View.GONE
+                binding.ivNote.tag = null
                 Log.i(TAG, "viewModel.noteImageDeleted.observe")
             }
         )
