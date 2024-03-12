@@ -259,28 +259,11 @@ class NoteDetailActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-//        var filePath = ""
         var fileName = ""
 
         if (requestCode == REQUEST_CODE_SELECT_IMAGE) {
             if (data != null) {
                 val selectedImageUri = data.data
-
-                // 이게 정상적으로 동작하긴 하는데... playstore에서 정책적으로 reject할 것이다.
-//                selectedImageUri.let { returnUri ->
-//                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
-//                }?.use { cursor ->
-//                    val idx = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-//                    cursor.moveToFirst()
-//                    filePath = cursor.getString(idx)
-//                }
-//
-//                binding.ivNote.tag = filePath
-//                showImage(filePath)
-//
-//                viewModel.handleEvent(
-//                    NoteDetailEvent.OnNoteImageChange(filePath)
-//                )
 
                 selectedImageUri.let { returnUri ->
                     returnUri?.let { contentResolver.query(it, null, null, null, null) }
@@ -330,21 +313,6 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
     }
-
-//    private fun getPathFromUri(contentUri: Uri): String {
-//        // contentResolver와 cursor에 대해 공부 필요!
-//        val filePath: String
-//        val cursor = contentResolver.query(contentUri, null, null, null, null)
-//        if (cursor == null) {
-//            filePath = contentUri.path.toString()
-//        } else {
-//            cursor.moveToFirst()
-//            val index = cursor.getColumnIndex("_data")
-//            filePath = cursor.getString(index)
-//            cursor.close()
-//        }
-//        return filePath
-//    }
 
     private fun selectImage() {
         // private storage issue 때문에 이미지 복사
