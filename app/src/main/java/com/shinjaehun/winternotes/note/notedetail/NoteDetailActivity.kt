@@ -35,6 +35,10 @@ import com.shinjaehun.winternotes.common.makeToast
 import com.shinjaehun.winternotes.common.toEditable
 import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
 import java.io.File
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 private const val TAG = "NoteDetailActivity"
 class NoteDetailActivity : AppCompatActivity() {
@@ -259,7 +263,9 @@ class NoteDetailActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        var fileName = ""
+        var originFileName = ""
+        var originFileExtension = ""
+        var outputFileName = ""
 
         if (requestCode == REQUEST_CODE_SELECT_IMAGE) {
             if (data != null) {
@@ -273,7 +279,14 @@ class NoteDetailActivity : AppCompatActivity() {
                     cursor.moveToFirst()
 //                    Log.i(TAG, "${cursor.getString(nameIndex)}")
 //                    Log.i(TAG, "${cursor.getString(sizeIndex)}")
-                    fileName = cursor.getString(nameIndex)
+//                    val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+
+                    originFileName = cursor.getString(nameIndex)
+                    originFileExtension = originFileName.substringAfterLast('.', "")
+                    originFileName = originFileName.substringBeforeLast('.', "")
+                    val current = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date(System.currentTimeMillis()))
+                    outputFileName = "$originFileName$current.$originFileExtension"
+                    Log.i(TAG, "outputFileName : $outputFileName")
                 }
 
                 if (selectedImageUri != null) {
@@ -288,7 +301,7 @@ class NoteDetailActivity : AppCompatActivity() {
                         val path = this.getExternalFilesDir(null)
                         val folder = File(path, "images")
                         folder.mkdirs()
-                        val outputFile = File(folder, fileName)
+                        val outputFile = File(folder, outputFileName)
                         FileUtils.copyStreamToFile(inputStream!!, outputFile)
 
                         showImage(outputFile.path)
