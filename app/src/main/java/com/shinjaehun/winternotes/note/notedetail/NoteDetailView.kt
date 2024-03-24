@@ -8,63 +8,87 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
-import android.os.Build
-import android.os.Build.VERSION_CODES.P
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.MediaStore.Audio.Media
 import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.shinjaehun.winternotes.R
 import com.shinjaehun.winternotes.common.*
+import com.shinjaehun.winternotes.common.FileUtils.application
 import com.shinjaehun.winternotes.common.makeToast
 import com.shinjaehun.winternotes.common.toEditable
-import com.shinjaehun.winternotes.databinding.ActivityNoteDetailBinding
+import com.shinjaehun.winternotes.databinding.FragmentNoteDetailBinding
 import java.io.File
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
-private const val TAG = "NoteDetailActivity"
-class NoteDetailActivity : AppCompatActivity() {
+private const val TAG = "NoteDetailView"
+class NoteDetailView : Fragment() {
 
-    private lateinit var binding: ActivityNoteDetailBinding
+    private lateinit var binding: FragmentNoteDetailBinding
     private lateinit var viewModel: NoteDetailViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityNoteDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+//        return inflater.inflate(R.layout.fragment_note_detail, container, false)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            findNavController().navigate(R.id.noteListView)
+//            findNavController().popBackStack()
+//            activity?.finish()
+        }
+
+        binding = FragmentNoteDetailBinding.inflate(inflater)
+        return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
 
         viewModel = ViewModelProvider(
             this,
-            NoteDetailInjector(application).provideNoteDetailViewModelFactory())
-            .get(NoteDetailViewModel::class.java)
+            NoteDetailInjector(requireActivity().application).provideNoteDetailViewModelFactory()
+        ).get(
+            NoteDetailViewModel::class.java
+        )
 
-        binding.ivBack.setOnClickListener {
-            onBackPressed()
-        }
+//        binding.ivBack.setOnClickListener {
+//            onBackPressed() // 이게 activity에만 적용되는 거 같은디...
+//        }
 
         observeViewModel()
 
-        val noteId = intent.getStringExtra("noteId").toString()
-//        Log.i(TAG, "noteId: $noteId") // NoteListActivity에서 intent로 "0"을 보냄
-        viewModel.handleEvent(NoteDetailEvent.OnStart(noteId))
+        viewModel.handleEvent(
+            NoteDetailEvent.OnStart(
+                NoteDetailViewArgs.fromBundle(requireArguments()).noteId
+            )
+        )
+
+        binding.ivBack.setOnClickListener {
+            findNavController().navigate(R.id.noteListView)
+        }
 
         binding.ivSave.setOnClickListener {
             if (binding.etNoteTitle.text.toString().trim().isEmpty()) {
@@ -93,7 +117,7 @@ class NoteDetailActivity : AppCompatActivity() {
                         binding.etNoteContent.text.toString(),
                         selectedImagePath, // 일단 임시로 이렇게는 해놨는데... 이렇게 해도 되는건지는 모르겠음.
                         colorCode, //colorCode도 사실 저렇게 전역변수로 처리하면 될텐데 그렇게 하면 안되는거지?
-                         // 얘는 빈 값일때 그냥 null로 처리했으면 좋겠는데...
+                        // 얘는 빈 값일때 그냥 null로 처리했으면 좋겠는데...
                         webUrl
 //                    Note(
 //                        //여기서 noteId를 어떻게 처리해야 할지 모르겠네...
@@ -105,6 +129,66 @@ class NoteDetailActivity : AppCompatActivity() {
 
         initMisc()
     }
+
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        binding = ActivityNoteDetailBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
+//
+//        viewModel = ViewModelProvider(
+//            this,
+//            NoteDetailInjector(application).provideNoteDetailViewModelFactory())
+//            .get(NoteDetailViewModel::class.java)
+//
+//        binding.ivBack.setOnClickListener {
+//            onBackPressed()
+//        }
+//
+//        observeViewModel()
+//
+//        val noteId = intent.getStringExtra("noteId").toString()
+////        Log.i(TAG, "noteId: $noteId") // NoteListActivity에서 intent로 "0"을 보냄
+//        viewModel.handleEvent(NoteDetailEvent.OnStart(noteId))
+//
+//        binding.ivSave.setOnClickListener {
+//            if (binding.etNoteTitle.text.toString().trim().isEmpty()) {
+//                showErrorState("Note title can't be empty")
+//            } else if (binding.etNoteSubtitle.text.toString().trim().isEmpty()) {
+//                showErrorState("Note subtitle can't be empty")
+//            } else if (binding.etNoteContent.text.toString().trim().isEmpty()) {
+//                showErrorState("Note content can't be empty")
+//            } else {
+//
+//                val selectedImagePath: String? = binding.ivNote.tag as String?
+//                Log.i(TAG, "selectedImagePath: $selectedImagePath")
+//
+//                val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
+//                val colorCode = String.format("#%06X", (0xFFFFFF and gradientDrawable.color!!.defaultColor!!));
+//                // colorCode는 null 값을 가질 수 없음!
+//
+//                val webUrl = binding.tvWebUrl.text.toString().ifEmpty {
+//                    null
+//                }
+//
+//                viewModel.handleEvent(
+//                    NoteDetailEvent.OnDoneClick(
+//                        binding.etNoteTitle.text.toString(),
+//                        binding.etNoteSubtitle.text.toString(),
+//                        binding.etNoteContent.text.toString(),
+//                        selectedImagePath, // 일단 임시로 이렇게는 해놨는데... 이렇게 해도 되는건지는 모르겠음.
+//                        colorCode, //colorCode도 사실 저렇게 전역변수로 처리하면 될텐데 그렇게 하면 안되는거지?
+//                         // 얘는 빈 값일때 그냥 null로 처리했으면 좋겠는데...
+//                        webUrl
+////                    Note(
+////                        //여기서 noteId를 어떻게 처리해야 할지 모르겠네...
+////                    )
+//                    )
+//                )
+//            }
+//        }
+//
+//        initMisc()
+//    }
 
     private fun initMisc() {
         val layoutMisc : LinearLayout = binding.misc.layoutMisc
@@ -182,8 +266,8 @@ class NoteDetailActivity : AppCompatActivity() {
         binding.misc.layoutAddImage.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-            if (ContextCompat.checkSelfPermission(this,READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(requireContext(),READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(requireContext(), READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(
                     arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_VIDEO), REQUEST_CODE_STORAGE_PERMISSION
                 )
@@ -204,43 +288,43 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     private fun showDeleteNoteDialog() {
-        val builder = AlertDialog.Builder(this@NoteDetailActivity)
-        val view: View = LayoutInflater.from(this).inflate(
+        val builder = AlertDialog.Builder(requireContext())
+        val v: View = LayoutInflater.from(requireContext()).inflate(
             R.layout.layout_delete_note,
-            findViewById(R.id.layout_DeleteNoteContainer)
+            view?.findViewById(R.id.layout_DeleteNoteContainer)
         )
-        builder.setView(view)
+        builder.setView(v)
         val dialogDeleteNote: AlertDialog = builder.create()
         if (dialogDeleteNote.window != null) {
             dialogDeleteNote.window!!.setBackgroundDrawable(ColorDrawable(0))
         }
-        view.findViewById<TextView>(R.id.tv_DeleteNote).setOnClickListener {
+        v.findViewById<TextView>(R.id.tv_DeleteNote).setOnClickListener {
             viewModel.handleEvent(
                 NoteDetailEvent.OnDeleteClick
             )
             dialogDeleteNote.dismiss()
         }
-        view.findViewById<TextView>(R.id.tv_DeleteNote_Cancel).setOnClickListener {
+        v.findViewById<TextView>(R.id.tv_DeleteNote_Cancel).setOnClickListener {
             dialogDeleteNote.dismiss()
         }
         dialogDeleteNote.show()
     }
 
     private fun showAddURLDialog() {
-        val builder = AlertDialog.Builder(this@NoteDetailActivity)
-        val view: View = LayoutInflater.from(this).inflate(
+        val builder = AlertDialog.Builder(requireContext())
+        val v: View = LayoutInflater.from(requireContext()).inflate(
             R.layout.layout_add_url,
-            findViewById(R.id.layout_addUrlContainer)
+            view?.findViewById(R.id.layout_addUrlContainer)
         )
-        builder.setView(view)
+        builder.setView(v)
         val dialogAddURL: AlertDialog = builder.create()
         if (dialogAddURL.window != null) {
             dialogAddURL.window!!.setBackgroundDrawable(ColorDrawable(0))
         }
-        val inputURL = view.findViewById<EditText>(R.id.et_url)
+        val inputURL = v.findViewById<EditText>(R.id.et_url)
         inputURL.requestFocus()
 
-        view.findViewById<TextView>(R.id.tv_AddUrl).setOnClickListener {
+        v.findViewById<TextView>(R.id.tv_AddUrl).setOnClickListener {
             if (inputURL.text.toString().trim().isEmpty()){
                 showErrorState("Enter URL")
             } else if (!Patterns.WEB_URL.matcher(inputURL.text.toString()).matches()){
@@ -253,7 +337,7 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
 
-        view.findViewById<TextView>(R.id.tv_AddUrl_Cancel).setOnClickListener {
+        v.findViewById<TextView>(R.id.tv_AddUrl_Cancel).setOnClickListener {
             dialogAddURL.dismiss()
         }
 
@@ -272,7 +356,7 @@ class NoteDetailActivity : AppCompatActivity() {
                 val selectedImageUri = data.data
 
                 selectedImageUri.let { returnUri ->
-                    returnUri?.let { contentResolver.query(it, null, null, null, null) }
+                    returnUri?.let { requireActivity().contentResolver.query(it, null, null, null, null) }
                 }?.use { cursor ->
                     val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
 //                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
@@ -294,11 +378,11 @@ class NoteDetailActivity : AppCompatActivity() {
 
                     try {
                         // private storage issue 때문에 이미지 복사
-                        FileUtils.application = application
-                        FileUtils.cRes = contentResolver
+                        FileUtils.application = requireActivity().application
+                        FileUtils.cRes = requireActivity().contentResolver
 
                         val inputStream = FileUtils.getInputStream(selectedImageUri)
-                        val path = this.getExternalFilesDir(null)
+                        val path = requireActivity().getExternalFilesDir(null)
                         val folder = File(path, "images")
                         folder.mkdirs()
                         val outputFile = File(folder, outputFileName)
@@ -320,6 +404,7 @@ class NoteDetailActivity : AppCompatActivity() {
 //
 //                        selectedImagePath = getPathFromUri(selectedImageUri)
                     } catch (e: Exception) {
+                        Log.i(TAG, e.toString())
                         showErrorState(e.toString())
                     }
                 }
@@ -360,13 +445,13 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     private fun showDialogToGetPermission() {
-        val builder = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Permissions request")
             .setMessage("We need the permission for some reason." +
             "You need to move on Settings to grant some permissions")
         builder.setPositiveButton("OK") { dialogInterface, i ->
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.fromParts("package", packageName, null))
+                Uri.fromParts("package", "packageName", null))
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         }
@@ -465,17 +550,18 @@ class NoteDetailActivity : AppCompatActivity() {
         )
 
         viewModel.updated.observe(
-            this,
+            viewLifecycleOwner,
             Observer {
 //                Log.i(TAG, "2 $selectedImagePath")
 
                 Log.i(TAG, "viewModel.update.observe")
-                finish()
+                findNavController().navigate(R.id.noteListView)
+
             }
         )
 
         viewModel.noteColor.observe(
-            this,
+            viewLifecycleOwner,
             Observer { noteColor ->
 //                Log.i(TAG, "4 $selectedImagePath")
                 setSubtitleIndicatorColor(noteColor)
@@ -484,7 +570,7 @@ class NoteDetailActivity : AppCompatActivity() {
         )
 
         viewModel.noteImage.observe(
-            this,
+            viewLifecycleOwner,
             Observer{ imagePath ->
                 if (!imagePath.isNullOrEmpty()) {
 //                    selectedImagePath = imagePath // 얘를 이렇게 저장하면 안되는거?
@@ -499,7 +585,7 @@ class NoteDetailActivity : AppCompatActivity() {
         )
 
         viewModel.webLink.observe(
-            this,
+            viewLifecycleOwner,
             Observer { webLink ->
                 showURL(webLink)
                 Log.i(TAG, "viewModel.webLink.observe")
@@ -507,16 +593,16 @@ class NoteDetailActivity : AppCompatActivity() {
         )
 
         viewModel.deleted.observe(
-            this,
+            viewLifecycleOwner,
             Observer {
-                finish()
                 Log.i(TAG, "viewModel.deleted.observe")
+                findNavController().navigate(R.id.noteListView)
             }
         )
 
 
         viewModel.noteImageDeleted.observe(
-            this,
+            viewLifecycleOwner,
             Observer {
                 binding.ivNote.visibility = View.GONE
                 binding.ivDeleteImage.visibility = View.GONE
@@ -526,7 +612,7 @@ class NoteDetailActivity : AppCompatActivity() {
         )
 
         viewModel.noteURLDeleted.observe(
-            this,
+            viewLifecycleOwner,
             Observer {
                 binding.tvWebUrl.text = ""
                 binding.tvWebUrl.visibility = View.GONE
@@ -536,11 +622,27 @@ class NoteDetailActivity : AppCompatActivity() {
         )
 
         viewModel.deleted.observe(
-            this,
+            viewLifecycleOwner,
             Observer {
                 Log.i(TAG, "viewModel.deleted.observe")
+                findNavController().navigate(R.id.noteListView)
             }
         )
+
+//        requireActivity().onBackPressedDispatcher.addCallback(this) {
+////            findNavController().navigate(R.id.noteListView)
+//            findNavController().popBackStack()
+//        }
+
+//        val callback: OnBackPressedCallback = object :
+//            OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                this.remove()
+//                activity?.onBackPressed()
+//            }
+//        }
+//        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+
     }
 
     private fun showErrorState(errorMessage: String?) = makeToast(errorMessage!!)
