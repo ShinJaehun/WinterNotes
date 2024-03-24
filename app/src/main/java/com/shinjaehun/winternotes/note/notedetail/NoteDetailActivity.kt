@@ -284,13 +284,13 @@ class NoteDetailActivity : AppCompatActivity() {
                     originFileName = cursor.getString(nameIndex)
                     originFileExtension = originFileName.substringAfterLast('.', "")
                     originFileName = originFileName.substringBeforeLast('.', "")
-                    val current = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date(System.currentTimeMillis()))
-                    outputFileName = "$originFileName$current.$originFileExtension"
-                    Log.i(TAG, "outputFileName : $outputFileName")
+                    val currentTime = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date(System.currentTimeMillis()))
+                    outputFileName = "$originFileName$currentTime.$originFileExtension"
+//                    Log.i(TAG, "outputFileName : $outputFileName")
                 }
 
                 if (selectedImageUri != null) {
-                    Log.i(TAG, "onActivityResult: ${selectedImageUri!!.path!!.substring(selectedImageUri!!.path!!.lastIndexOf('/') + 1)}")
+//                    Log.i(TAG, "onActivityResult: ${selectedImageUri!!.path!!.substring(selectedImageUri!!.path!!.lastIndexOf('/') + 1)}")
 
                     try {
                         // private storage issue 때문에 이미지 복사

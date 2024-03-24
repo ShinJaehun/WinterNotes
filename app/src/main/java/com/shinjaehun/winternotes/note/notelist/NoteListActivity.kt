@@ -108,14 +108,15 @@ class NoteListActivity : AppCompatActivity() {
             screenWidth = windowMetrics.bounds.width() - insets.left - insets.right
             screenHeight = windowMetrics.bounds.height() - insets.bottom - insets.top
         } else {
-            var point = Point()
+            val point = Point()
             wm.defaultDisplay.getRealSize(point)
             screenWidth = point.x
             screenHeight = point.y
         }
         setUpSnowEffect()
 
-        job1 = lifecycleScope.launch {
+//        job1 = lifecycleScope.launch {
+        job1 = GlobalScope.launch {
             withContext(Dispatchers.Main) {
                 updateSnowFlakes(10L)
             }
@@ -194,9 +195,9 @@ class NoteListActivity : AppCompatActivity() {
     private fun showErrorState(errorMessage: String?) = makeToast(errorMessage!!)
 
 
-    fun setUpSnowEffect() {
+    private fun setUpSnowEffect() {
         // generate 200 snow flake
-        var container: ViewGroup = window.decorView as ViewGroup
+        val container: ViewGroup = window.decorView as ViewGroup
         for (i in 0 until 30) {
             snowList.add(
                 SnowFlake(
@@ -210,9 +211,9 @@ class NoteListActivity : AppCompatActivity() {
         }
 
         Log.i(TAG, "the size of snowList: ${snowList.size}")
-
     }
-    suspend fun updateSnowFlakes(delay_refresh: Long){
+
+    private suspend fun updateSnowFlakes(delay_refresh: Long){
         while (isNotPaused) {
             for (snow: SnowFlake in snowList){
                 snow.update()
