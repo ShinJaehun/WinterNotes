@@ -390,7 +390,7 @@ class NoteDetailView : Fragment() {
 
                         showImage(outputFile.path)
 
-                        binding.ivNote.tag = outputFile.path
+//                        binding.ivNote.tag = outputFile.path
 
                         viewModel.handleEvent(
                             NoteDetailEvent.OnNoteImageChange(outputFile.path)
@@ -465,6 +465,9 @@ class NoteDetailView : Fragment() {
     private fun showImage(path: String){
         binding.ivNote.setImageURI(Uri.parse(path))
         binding.ivNote.visibility = View.VISIBLE
+
+        binding.ivNote.tag = path
+
         binding.ivDeleteImage.visibility = View.VISIBLE
         binding.ivDeleteImage.setOnClickListener {
 
