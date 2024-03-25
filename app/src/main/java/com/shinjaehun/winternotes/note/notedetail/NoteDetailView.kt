@@ -587,7 +587,10 @@ class NoteDetailView : Fragment() {
         viewModel.webLink.observe(
             viewLifecycleOwner,
             Observer { webLink ->
-                showURL(webLink)
+                if (webLink != null) {
+                    showURL(webLink)
+                }
+
                 Log.i(TAG, "viewModel.webLink.observe")
             }
         )

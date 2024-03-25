@@ -30,11 +30,11 @@ class NoteDetailViewModel(
     private val noteColorState = MutableLiveData<String>()
     val noteColor: LiveData<String> get() = noteColorState
 
-    private val noteImageState = MutableLiveData<String>()
-    val noteImage: LiveData<String> get() = noteImageState
+    private val noteImageState = MutableLiveData<String?>()
+    val noteImage: LiveData<String?> get() = noteImageState
 
-    private val webLinkState = MutableLiveData<String>()
-    val webLink: LiveData<String> get() = webLinkState
+    private val webLinkState = MutableLiveData<String?>()
+    val webLink: LiveData<String?> get() = webLinkState
 
     private val noteImageDeletedState = MutableLiveData<Boolean>()
     val noteImageDeleted: LiveData<Boolean> get() = noteImageDeletedState
@@ -62,7 +62,7 @@ class NoteDetailViewModel(
     }
 
     private fun changeWebLink(webLink: String?) {
-        webLinkState.value=webLink
+        webLinkState.value = webLink
     }
 
     private fun onNoteImageDelete() {
@@ -123,7 +123,7 @@ class NoteDetailViewModel(
             val noteResult = noteRepo.getNoteById(noteId)
 
             when (noteResult) {
-                is Result.Value -> noteState.value = noteResult.value
+                is Result.Value -> noteState.value = noteResult.value!!
                 is Result.Error -> errorState.value = GET_NOTE_ERROR
             }
         }
